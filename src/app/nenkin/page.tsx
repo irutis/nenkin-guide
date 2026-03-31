@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getArticlesByCategory } from '@/lib/articles'
 import { PREFECTURES } from '@/data/prefectures'
+import AdUnit from '@/components/AdUnit'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -38,6 +39,8 @@ export default function NenkinPage() {
             ))}
           </div>
         )}
+
+        <AdUnit slot="1234567890" format="horizontal" />
 
         {/* 都道府県別年金情報 */}
         <div style={{ marginTop: 8 }}>

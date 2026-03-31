@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getArticlesByCategory } from '@/lib/articles'
 import { PREFECTURES } from '@/data/prefectures'
+import AdUnit from '@/components/AdUnit'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -38,6 +39,8 @@ export default function KaigoPage() {
             ))}
           </div>
         )}
+
+        <AdUnit slot="3456789013" format="horizontal" />
 
         {/* 都道府県別介護情報 */}
         <div style={{ marginTop: 8 }}>

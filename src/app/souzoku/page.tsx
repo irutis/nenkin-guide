@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getArticlesByCategory } from '@/lib/articles'
 import { PREFECTURES } from '@/data/prefectures'
+import AdUnit from '@/components/AdUnit'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -38,6 +39,8 @@ export default function SouzokuPage() {
             ))}
           </div>
         )}
+
+        <AdUnit slot="2345678901" format="horizontal" />
 
         {/* 都道府県別相続情報 */}
         <div style={{ marginTop: 8 }}>
