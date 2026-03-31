@@ -2,41 +2,51 @@
   {
     "id": "hoken-minaoshi",
     "name": "保険見直し本舗",
-    "description": "無料で保険を見直し。老後の保障を最適化",
+    "description": "無料で保険を見直し。相談成立で高額報酬",
     "color": "blue",
-    "a8_ins_id": "",
+    "a8_ins_id": "s00000027364001",
     "banner_html": "",
     "fallback_url": "",
     "program_name_keyword": "保険見直し本舗"
   },
   {
-    "id": "hoken-no-madoguchi",
-    "name": "ほけんの窓口",
-    "description": "全国900店舗。保険相談は無料・何度でも",
+    "id": "money-doctor",
+    "name": "マネードクター",
+    "description": "お金・保険の無料相談。全国対応",
     "color": "green",
-    "a8_ins_id": "",
+    "a8_ins_id": "s00000020829001",
     "banner_html": "",
     "fallback_url": "",
-    "program_name_keyword": "ほけんの窓口"
+    "program_name_keyword": "マネードクター"
   },
   {
     "id": "minna-no-kaigo",
     "name": "みんなの介護",
     "description": "全国の老人ホーム・介護施設を無料で比較・相談",
     "color": "orange",
-    "a8_ins_id": "",
+    "a8_ins_id": "s00000024591001",
     "banner_html": "",
     "fallback_url": "",
     "program_name_keyword": "みんなの介護"
   },
   {
-    "id": "ii-sogi",
-    "name": "小さなお葬式",
-    "description": "葬儀費用を最大50万円節約。全国対応",
+    "id": "yorisoou-ososhiki",
+    "name": "よりそうお葬式",
+    "description": "全国対応。8.91万円からのお葬式",
     "color": "gray",
-    "a8_ins_id": "",
+    "a8_ins_id": "s00000016461001",
     "banner_html": "",
     "fallback_url": "",
-    "program_name_keyword": "小さなお葬式"
+    "program_name_keyword": "よりそうお葬式"
+  },
+  {
+    "id": "anshin-sogi",
+    "name": "安心葬儀",
+    "description": "葬儀情報・全国の斎場・葬儀社を検索",
+    "color": "gray",
+    "a8_ins_id": "s00000001248023",
+    "banner_html": "",
+    "fallback_url": "",
+    "program_name_keyword": "安心葬儀"
   }
 ]
