@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { getArticleBySlug, getAllArticles, CATEGORY_LABELS, CATEGORY_COLOR } from '@/lib/articles'
 import type { Metadata } from 'next'
 
+
+
 export async function generateStaticParams() {
   const articles = getAllArticles()
   return articles.map(a => ({ slug: a.slug }))
@@ -120,6 +122,38 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             ⚠️ 本記事は一般的な情報提供を目的としています。個別の状況については、年金事務所・市区町村の窓口・専門家にご相談ください。
           </p>
         </div>
+
+        {/* 関連記事 */}
+        {article.relatedSlugs && article.relatedSlugs.length > 0 && (() => {
+          const related = article.relatedSlugs!.map(s => getArticleBySlug(s)).filter(Boolean)
+          if (related.length === 0) return null
+          return (
+            <div style={{ marginTop: 40 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 700, color: '#1a1a1a', marginBottom: 16 }}>関連記事</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {related.map(r => (
+                  <Link
+                    key={r!.slug}
+                    href={`/article/${r!.slug}`}
+                    style={{
+                      background: 'white',
+                      border: '1px solid #ddd',
+                      borderRadius: 12,
+                      padding: '14px 18px',
+                      textDecoration: 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <span style={{ fontSize: 16, color: '#1a1a1a', fontWeight: 600 }}>{r!.title}</span>
+                    <span style={{ color: '#aaa', fontSize: 20, flexShrink: 0, marginLeft: 12 }}>›</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )
+        })()}
 
         {/* カテゴリへ戻る */}
         <div style={{ marginTop: 40, textAlign: 'center' }}>
