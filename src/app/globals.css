@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f8f7f4;
+  --foreground: #1a1a1a;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', 'Yu Gothic', sans-serif;
+  font-size: 18px;
+  line-height: 1.85;
+}
+
+h1, h2, h3, h4 {
+  line-height: 1.45;
+  font-weight: 700;
+}
+
+/* シニア向け：タップ領域を広く確保 */
+button, a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
