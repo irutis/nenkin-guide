@@ -42,3 +42,12 @@ next-env.d.ts
 
 # npm cache
 .npm-cache
+
+# 一時ファイル・スクリーンショット
+*.png
+*.txt
+a8-*.json
+ss-*.png
+login-test.png
+page-html.txt
+
