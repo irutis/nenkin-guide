@@ -5,6 +5,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "年金・相続・介護の手続きガイド｜わかりやすく解説",
   description: "年金の受け取り方・相続手続き・介護申請など、60代70代の方が直面する手続きをわかりやすく解説します。",
+  verification: {
+    google: 'NIsSPvdErjBz8aXwL-nIlK7xY2mzJ5ZyoTE0gPzp-nE',
+  },
 };
 
 export default function RootLayout({
