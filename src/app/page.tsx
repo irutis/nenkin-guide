@@ -31,6 +31,7 @@ const TOPICS = [
 ]
 
 const POPULAR = [
+  { href: '/simulator', text: '📊 年金受取額シミュレーター（無料）' },
   { href: '/article/nenkin-tsuki-ikura', text: '年金は月いくらもらえる？' },
   { href: '/article/nenkin-shinsei-houhou', text: '年金の受け取り申請方法' },
   { href: '/article/nenkin-kurisage', text: '繰り下げ受給はお得？' },
