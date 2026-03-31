@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getArticleBySlug, getAllArticles, CATEGORY_LABELS, CATEGORY_COLOR } from '@/lib/articles'
 import AffiliateBanners from '@/components/AffiliateBanners'
+import AdUnit from '@/components/AdUnit'
 import type { Metadata } from 'next'
 
 
@@ -113,6 +114,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                   </p>
                 ))}
               </div>
+              {/* 記事の真ん中に広告を挿入 */}
+              {i === Math.floor(article.sections.length / 2) - 1 && (
+                <AdUnit slot="3456789012" format="auto" />
+              )}
             </section>
           ))}
         </div>
