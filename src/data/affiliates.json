@@ -1,0 +1,42 @@
+[
+  {
+    "id": "hoken-minaoshi",
+    "name": "保険見直し本舗",
+    "description": "無料で保険を見直し。老後の保障を最適化",
+    "color": "blue",
+    "a8_ins_id": "",
+    "banner_html": "",
+    "fallback_url": "",
+    "program_name_keyword": "保険見直し本舗"
+  },
+  {
+    "id": "hoken-no-madoguchi",
+    "name": "ほけんの窓口",
+    "description": "全国900店舗。保険相談は無料・何度でも",
+    "color": "green",
+    "a8_ins_id": "",
+    "banner_html": "",
+    "fallback_url": "",
+    "program_name_keyword": "ほけんの窓口"
+  },
+  {
+    "id": "minna-no-kaigo",
+    "name": "みんなの介護",
+    "description": "全国の老人ホーム・介護施設を無料で比較・相談",
+    "color": "orange",
+    "a8_ins_id": "",
+    "banner_html": "",
+    "fallback_url": "",
+    "program_name_keyword": "みんなの介護"
+  },
+  {
+    "id": "ii-sogi",
+    "name": "小さなお葬式",
+    "description": "葬儀費用を最大50万円節約。全国対応",
+    "color": "gray",
+    "a8_ins_id": "",
+    "banner_html": "",
+    "fallback_url": "",
+    "program_name_keyword": "小さなお葬式"
+  }
+]

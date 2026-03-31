@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getArticleBySlug, getAllArticles, CATEGORY_LABELS, CATEGORY_COLOR } from '@/lib/articles'
+import AffiliateBanners from '@/components/AffiliateBanners'
 import type { Metadata } from 'next'
 
 
@@ -115,6 +116,9 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             </section>
           ))}
         </div>
+
+        {/* アフィリエイトバナー */}
+        <AffiliateBanners />
 
         {/* 注意書き */}
         <div style={{ background: '#fff8e1', border: '1px solid #f5c518', borderRadius: 12, padding: '16px 20px', marginTop: 32 }}>
