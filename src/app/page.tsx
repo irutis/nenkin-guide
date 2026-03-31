@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import AdUnit from '@/components/AdUnit'
 
 const TOPICS = [
   {
@@ -146,6 +147,8 @@ export default function HomePage() {
             ))}
           </div>
         </section>
+
+        <AdUnit slot="5678901234" format="auto" />
 
         {/* 信頼バッジ */}
         <section className="mt-10" style={{ background: 'white', borderRadius: 16, border: '1px solid #ddd', padding: '20px 24px' }}>

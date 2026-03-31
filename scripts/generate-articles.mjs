@@ -59,6 +59,27 @@ const KEYWORDS = [
   { category: 'kaigo', title: '介護の「ケアマネジャー」とは？役割と選び方', slug: 'care-manager-toha', keywords: ['ケアマネジャー', 'ケアマネ 選び方'] },
   { category: 'kaigo', title: 'デイサービスとは？費用・利用方法・選び方を解説', slug: 'day-service-toha', keywords: ['デイサービス 費用', 'デイサービス 選び方'] },
   { category: 'kaigo', title: '高額介護サービス費とは？申請すれば介護費が戻ってくる', slug: 'kougaku-kaigo-service-hi', keywords: ['高額介護サービス費', '介護費 払い戻し'] },
+
+  // 年金（追加）
+  { category: 'nenkin', title: '年金の確定申告は必要？しなくていいケースと手順', slug: 'nenkin-kakutei-shinkoku', keywords: ['年金 確定申告', '年金 税金'] },
+  { category: 'nenkin', title: '未納期間がある場合の年金はどうなる？追納の方法', slug: 'nenkin-mino-tsuino', keywords: ['年金 未納', '年金 追納'] },
+  { category: 'nenkin', title: '離婚したら年金はどうなる？年金分割のしくみ', slug: 'nenkin-rikon-bunkatsu', keywords: ['年金分割', '離婚 年金'] },
+  { category: 'nenkin', title: '自営業者の老後の備え｜国民年金だけでは足りない場合', slug: 'kojin-jieigyo-rogo', keywords: ['自営業 年金 足りない', '国民年金 老後'] },
+  { category: 'nenkin', title: '年金受給者が死亡した場合の手続き｜返金・停止の方法', slug: 'nenkin-jyukyusha-shibou', keywords: ['年金受給者 死亡 手続き', '年金 停止 死亡'] },
+
+  // 相続（追加）
+  { category: 'souzoku', title: '相続人が誰もいない場合はどうなる？国庫帰属の手続き', slug: 'souzoku-inin-nashi', keywords: ['相続人なし', '相続 国庫'] },
+  { category: 'souzoku', title: '相続税がかからない場合とは？基礎控除の計算方法', slug: 'sozokuzei-kakaranai', keywords: ['相続税 かからない', '相続税 基礎控除'] },
+  { category: 'souzoku', title: '生前贈与とは？相続税対策としての活用方法', slug: 'seizenzoyo-katsuyo', keywords: ['生前贈与', '相続税対策 生前贈与'] },
+  { category: 'souzoku', title: '相続登記の義務化とは？2024年改正でどう変わったか', slug: 'souzoku-toki-gimuuka', keywords: ['相続登記 義務化', '相続登記 2024'] },
+  { category: 'souzoku', title: '空き家を相続したら？放置するリスクと売却・活用の方法', slug: 'akiya-souzoku-risuku', keywords: ['空き家 相続', '相続 空き家 どうする'] },
+
+  // 介護（追加）
+  { category: 'kaigo', title: '介護が必要になったら最初にやること｜相談窓口と手順', slug: 'kaigo-hajime-tejun', keywords: ['介護 始め方', '介護 最初にやること'] },
+  { category: 'kaigo', title: '介護保険料はいくら？計算方法と支払い方法を解説', slug: 'kaigo-hokenryo-keisan', keywords: ['介護保険料 計算', '介護保険料 いくら'] },
+  { category: 'kaigo', title: 'グループホームとは？認知症の方が入居できる施設の詳細', slug: 'group-home-toha', keywords: ['グループホーム', 'グループホーム 認知症'] },
+  { category: 'kaigo', title: '訪問介護とは？サービス内容・費用・利用手順を解説', slug: 'houmon-kaigo-toha', keywords: ['訪問介護', '訪問介護 費用'] },
+  { category: 'kaigo', title: '遠距離介護の現実｜仕事を辞めずに続けるための工夫', slug: 'enkyo-kaigo-kofu', keywords: ['遠距離介護', '仕事 介護 両立'] },
 ]
 
 async function generateArticle(keyword) {
