@@ -31,12 +31,12 @@ const TOPICS = [
 ]
 
 const POPULAR = [
-  { href: '/nenkin/ikura', text: '年金は月いくらもらえる？' },
-  { href: '/nenkin/shinsei', text: '年金の受け取り申請方法' },
-  { href: '/nenkin/kurisage', text: '繰り下げ受給はお得？' },
-  { href: '/souzoku/nagare', text: '相続手続きの流れ（全体像）' },
-  { href: '/kaigo/nintei', text: '要介護認定の申請方法' },
-  { href: '/kaigo/hiyo', text: '介護にかかる費用の目安' },
+  { href: '/article/nenkin-tsuki-ikura', text: '年金は月いくらもらえる？' },
+  { href: '/article/nenkin-shinsei-houhou', text: '年金の受け取り申請方法' },
+  { href: '/article/nenkin-kurisage', text: '繰り下げ受給はお得？' },
+  { href: '/article/souzoku-nagare', text: '相続手続きの流れ（全体像）' },
+  { href: '/article/kaigo-nintei-shinsei', text: '要介護認定の申請方法' },
+  { href: '/article/kaigo-hiyo-meyasu', text: '介護にかかる費用の目安' },
 ]
 
 export default function HomePage() {
