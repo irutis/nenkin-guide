@@ -37,8 +37,8 @@ const POPULAR = [
   { href: '/article/nenkin-shinsei-houhou', text: '年金の受け取り申請方法' },
   { href: '/article/nenkin-kurisage', text: '繰り下げ受給はお得？' },
   { href: '/article/souzoku-nagare', text: '相続手続きの流れ（全体像）' },
-  { href: '/article/kaigo-nintei-shinsei', text: '要介護認定の申請方法' },
-  { href: '/article/kaigo-hiyo-meyasu', text: '介護にかかる費用の目安' },
+  { href: '/article/yuigonsho-kakikata', text: '遺言書の書き方' },
+  { href: '/article/sozokuzei-keisan', text: '相続税はいくら？計算方法' },
 ]
 
 export default function HomePage() {
