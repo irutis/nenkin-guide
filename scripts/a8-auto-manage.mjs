@@ -122,45 +122,84 @@ async function getTextLink(page, insId, name) {
   }
 }
 
-// キーワード検索でプログラムを探す
+// キーワード検索でプログラムを探す（フォーム送信方式）
 async function searchProgram(page, keyword) {
   try {
-    // media/searchAction/keyword.do が正しい検索URL
+    // まず検索ページを開く
     await page.goto(
-      `https://pub.a8.net/a8v2/media/searchAction/keyword.do?keyword=${encodeURIComponent(keyword)}`,
+      'https://pub.a8.net/a8v2/media/searchAction/keyword.do',
       { waitUntil: 'networkidle', timeout: 60000 }
     )
-    await page.waitForTimeout(2000)
+    await page.waitForTimeout(1500)
+
+    // キーワード入力フィールドを探して入力
+    const keywordInput = page.locator('input[name="keyword"], input[type="text"][name*="word"], input[placeholder*="キーワード"], input[placeholder*="検索"]').first()
+    if (await keywordInput.isVisible().catch(() => false)) {
+      await keywordInput.fill(keyword)
+      // フォーム送信
+      await keywordInput.press('Enter')
+    } else {
+      // フォームのinputを全て試す
+      const inputs = await page.locator('input[type="text"], input[type="search"]').all()
+      let filled = false
+      for (const input of inputs) {
+        if (await input.isVisible().catch(() => false)) {
+          await input.fill(keyword)
+          await input.press('Enter')
+          filled = true
+          break
+        }
+      }
+      if (!filled) {
+        // submitボタンがある場合
+        const submitBtn = page.locator('input[type="submit"], button[type="submit"], button:has-text("検索")').first()
+        if (await submitBtn.isVisible().catch(() => false)) {
+          await submitBtn.click()
+        }
+      }
+    }
+
+    await page.waitForTimeout(3000)
 
     const programs = await page.evaluate(() => {
       const results = []
 
       // insId= を含むリンクを全て収集
-      const links = document.querySelectorAll('a[href*="insId="], a[href*="programDetail"]')
+      const links = document.querySelectorAll('a[href*="insId="]')
       links.forEach(link => {
         const href = link.getAttribute('href') || ''
         const insIdMatch = href.match(/insId=(s\d+)/)
         if (insIdMatch) {
           const name = link.textContent.trim()
-          if (name && name.length > 1 && !name.includes('詳細') && !name.includes('広告')) {
+          if (name && name.length > 1) {
             results.push({ name, insId: insIdMatch[1] })
           }
         }
       })
 
-      // ECID: パターンからも取得（ページ内テキスト）
+      // ECID: パターンからも収集
       const html = document.body.innerHTML
-      const ecidMatches = html.matchAll(/\[ECID:(s\d+)\][^<]*<\/[^>]+>\s*([^<\n]{2,40})/g)
-      for (const m of ecidMatches) {
-        results.push({ name: m[2].trim(), insId: m[1] })
+      const ecidPattern = /ECID:(s\d+)/g
+      let m
+      while ((m = ecidPattern.exec(html)) !== null) {
+        if (!results.find(r => r.insId === m[1])) {
+          results.push({ name: `(insId: ${m[1]})`, insId: m[1] })
+        }
       }
 
       return [...new Map(results.map(r => [r.insId, r])).values()]
     })
 
-    if (programs.length === 0) {
-      const pageText = await page.evaluate(() => document.body.innerText.slice(0, 200))
-      console.log(`    ページ内容確認: ${pageText.replace(/\s+/g, ' ').slice(0, 100)}`)
+    const resultCount = await page.evaluate(() => {
+      const t = document.body.innerText
+      const m = t.match(/該当件数[：:]\s*(\d+)/)
+      return m ? parseInt(m[1]) : null
+    })
+
+    if (resultCount !== null) console.log(`    該当件数: ${resultCount}件, insId取得: ${programs.length}件`)
+    else if (programs.length === 0) {
+      const snippet = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' ').slice(0, 150))
+      console.log(`    結果なし | ページ: ${snippet}`)
     }
 
     return programs
