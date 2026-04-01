@@ -1,12 +1,12 @@
 /**
- * A8.net 完全自動管理スクリプト
+ * A8.net 完全自動管理スクリプト v2
  *
  * やること:
  *   1. A8.netにログイン
- *   2. 提携済みプログラムのテキストリンク（a8mat URL）を取得
- *   3. 未提携の優良プログラムを探して自動申請
- *   4. affiliates.json を更新
- *   5. simulator ページのリンクを更新
+ *   2. 提携済みプログラムリストを取得
+ *   3. ターゲットプログラムのテキストリンク（a8mat URL）を取得
+ *   4. 未提携の優良プログラムを探して自動申請
+ *   5. affiliates.json・simulator/page.tsx を更新
  *   6. git commit & push
  *
  * 実行: node --env-file=.env.local scripts/a8-auto-manage.mjs
@@ -25,23 +25,22 @@ const A8_LOGIN_ID = process.env.A8_LOGIN_ID
 const A8_PASSWORD = process.env.A8_PASSWORD
 
 if (!A8_LOGIN_ID || !A8_PASSWORD) {
-  console.error('❌ .env.local に A8_LOGIN_ID と A8_PASSWORD を設定してください')
+  console.error('❌ A8_LOGIN_ID と A8_PASSWORD を設定してください')
   process.exit(1)
 }
 
-// ターゲットプログラム（カテゴリ別キーワード）
+// 探すプログラムキーワードと最低報酬
 const SEARCH_TARGETS = [
-  { keyword: '保険相談',  category: 'insurance', minReward: 5000 },
-  { keyword: '保険見直し', category: 'insurance', minReward: 5000 },
-  { keyword: '老人ホーム', category: 'kaigo',     minReward: 1000 },
-  { keyword: '介護',      category: 'kaigo',     minReward: 1000 },
-  { keyword: 'お葬式',    category: 'funeral',   minReward: 2000 },
-  { keyword: '葬儀',      category: 'funeral',   minReward: 2000 },
-  { keyword: '相続',      category: 'souzoku',   minReward: 3000 },
+  { keyword: '保険見直し本舗', category: 'insurance', minReward: 3000 },
+  { keyword: '保険見直しラボ', category: 'insurance', minReward: 3000 },
+  { keyword: 'マネードクター',  category: 'insurance', minReward: 3000 },
+  { keyword: 'ほけんの窓口',   category: 'insurance', minReward: 3000 },
+  { keyword: 'みんなの介護',   category: 'kaigo',     minReward: 1000 },
+  { keyword: 'LIFULL介護',    category: 'kaigo',     minReward: 1000 },
+  { keyword: 'よりそうお葬式', category: 'funeral',   minReward: 1000 },
+  { keyword: '安心葬儀',       category: 'funeral',   minReward: 1000 },
+  { keyword: '相続税',         category: 'souzoku',   minReward: 3000 },
 ]
-
-// simulatorページで使う保険系プログラムのカテゴリ
-const SIMULATOR_CATEGORY = 'insurance'
 
 async function login(page) {
   console.log('🔑 A8.net にログイン中...')
@@ -57,8 +56,38 @@ async function login(page) {
   console.log('✅ ログイン成功')
 }
 
-// 提携済みプログラムのテキストリンク（a8mat URL）を取得
-async function getTextLink(page, insId) {
+// 提携済みプログラムを全件取得（linkListAction）
+async function getLinkedPrograms(page) {
+  console.log('\n📋 提携済みプログラム一覧を取得中...')
+  await page.goto(
+    'https://pub.a8.net/a8v2/media/linkListAction.do?pageNo=1&pageSize=100',
+    { waitUntil: 'networkidle', timeout: 60000 }
+  )
+  await page.waitForTimeout(3000)
+
+  const programs = await page.evaluate(() => {
+    const results = []
+    const links = document.querySelectorAll('a[href*="insId="]')
+    links.forEach(link => {
+      const href = link.getAttribute('href') || ''
+      const insIdMatch = href.match(/insId=(s\d+)/)
+      if (insIdMatch) {
+        const name = link.textContent.trim()
+        if (name) {
+          results.push({ name, insId: insIdMatch[1], href })
+        }
+      }
+    })
+    return [...new Map(results.map(r => [r.insId, r])).values()]
+  })
+
+  console.log(`  提携済み: ${programs.length}件`)
+  programs.forEach(p => console.log(`    ✅ ${p.name} (${p.insId})`))
+  return programs
+}
+
+// テキストリンク（a8mat URL）を取得
+async function getTextLink(page, insId, name) {
   try {
     await page.goto(
       `https://pub.a8.net/a8v2/media/linkAction.do?insId=${insId}`,
@@ -66,88 +95,57 @@ async function getTextLink(page, insId) {
     )
     await page.waitForTimeout(3000)
 
-    // テキストリンクのtextareaを探す
+    // textareaからa8mat URLを取得
     const textareas = await page.locator('textarea').all()
     for (const ta of textareas) {
       const val = await ta.inputValue().catch(() => '')
-      // a8mat= を含むURLを探す（テキストリンク）
-      const match = val.match(/https:\/\/px\.a8\.net\/svt\/ejp\?a8mat=[^\s"'<]+/)
-      if (match) return match[0]
+      const match = val.match(/https:\/\/px\.a8\.net\/svt\/ejp\?a8mat=[^\s"'<&]+/)
+      if (match) {
+        console.log(`    🔗 テキストリンク取得: ${match[0].substring(0, 70)}...`)
+        return match[0]
+      }
     }
 
-    // textareaにない場合、ページ内のリンクを探す
-    const links = await page.locator('a[href*="px.a8.net"]').all()
-    for (const link of links) {
-      const href = await link.getAttribute('href').catch(() => '')
-      if (href && href.includes('a8mat=')) return href
+    // ページ内テキストからも探す
+    const bodyText = await page.evaluate(() => document.body.innerHTML)
+    const match = bodyText.match(/https:\/\/px\.a8\.net\/svt\/ejp\?a8mat=[^\s"'<&]+/)
+    if (match) {
+      console.log(`    🔗 テキストリンク取得（本文より）: ${match[0].substring(0, 70)}...`)
+      return match[0]
     }
 
+    console.log(`    ⚠️ ${name}: テキストリンクが見つかりません`)
     return null
   } catch (e) {
-    console.warn(`  ⚠️ テキストリンク取得失敗: ${e.message}`)
+    console.warn(`    ❌ ${name} リンク取得エラー: ${e.message}`)
     return null
   }
 }
 
-// プログラム申請状況を確認
-async function checkProgramStatus(page, insId) {
+// キーワード検索でプログラムを探す
+async function searchProgram(page, keyword) {
   try {
     await page.goto(
-      `https://pub.a8.net/a8v2/media/linkAction.do?insId=${insId}`,
+      `https://pub.a8.net/a8v2/program/programListAction.do?searchWord=${encodeURIComponent(keyword)}&genreId=&pageNo=1`,
       { waitUntil: 'networkidle', timeout: 60000 }
     )
     await page.waitForTimeout(2000)
-    const url = page.url()
-    const content = await page.content()
 
-    if (content.includes('提携中') || content.includes('a8mat=') || content.includes('linkAction')) {
-      return 'approved'
-    } else if (content.includes('審査中') || content.includes('申請中')) {
-      return 'pending'
-    } else if (content.includes('提携申請') || url.includes('programDetail')) {
-      return 'not_applied'
-    }
-    return 'unknown'
-  } catch {
-    return 'error'
-  }
-}
-
-// キーワードでプログラムを検索して優良プログラムを探す
-async function searchPrograms(page, keyword, minReward) {
-  try {
-    const searchUrl = `https://pub.a8.net/a8v2/media/searchAction/keyword.do?keyword=${encodeURIComponent(keyword)}&s_sortKey=epc&s_orderBy=DESC`
-    await page.goto(searchUrl, { waitUntil: 'networkidle', timeout: 60000 })
-    await page.waitForTimeout(3000)
-
-    const programs = await page.evaluate((minReward) => {
+    const programs = await page.evaluate(() => {
       const results = []
-      // プログラム一覧の各エントリを取得
-      const items = document.querySelectorAll('.program-item, .search-result-item, [class*="program"]')
-
-      items.forEach(item => {
-        const nameEl = item.querySelector('a[href*="programDetail"], .program-name a, h3 a, h4 a')
-        const rewardText = item.textContent || ''
-        const insIdMatch = item.innerHTML.match(/insId=([s\d]+)/) || item.innerHTML.match(/ECID:([s\d]+)/)
-        const epcMatch = rewardText.match(/EPC[^\d]*([\d.]+)/)
-        const rewardMatch = rewardText.match(/(\d{1,6})円/)
-
-        if (nameEl && insIdMatch) {
-          const reward = rewardMatch ? parseInt(rewardMatch[1]) : 0
-          const epc = epcMatch ? parseFloat(epcMatch[1]) : 0
-          if (reward >= minReward || epc > 0) {
-            results.push({
-              name: nameEl.textContent.trim(),
-              insId: insIdMatch[1],
-              reward,
-              epc,
-              href: nameEl.getAttribute('href'),
-            })
+      const links = document.querySelectorAll('a[href*="insId="]')
+      links.forEach(link => {
+        const href = link.getAttribute('href') || ''
+        const insIdMatch = href.match(/insId=(s\d+)/)
+        if (insIdMatch) {
+          const name = link.textContent.trim()
+          if (name && name.length > 1) {
+            results.push({ name, insId: insIdMatch[1], href })
           }
         }
       })
-      return results
-    }, minReward)
+      return [...new Map(results.map(r => [r.insId, r])).values()]
+    })
 
     return programs
   } catch (e) {
@@ -156,7 +154,7 @@ async function searchPrograms(page, keyword, minReward) {
   }
 }
 
-// プログラムに申請する
+// プログラム詳細ページから申請
 async function applyProgram(page, insId, name) {
   try {
     await page.goto(
@@ -165,55 +163,68 @@ async function applyProgram(page, insId, name) {
     )
     await page.waitForTimeout(2000)
 
+    const content = await page.content()
+
+    // 既に提携中
+    if (content.includes('提携中') || content.includes('linkAction')) {
+      console.log(`    ✅ 既に提携中: ${name}`)
+      return 'already_linked'
+    }
+
+    // 審査中
+    if (content.includes('審査中') || content.includes('申請中')) {
+      console.log(`    ⏳ 審査中: ${name}`)
+      return 'pending'
+    }
+
     // 申請ボタンを探す
-    const applyBtn = page.locator('input[value*="申請"], button:has-text("申請"), a:has-text("提携申請")').first()
-    if (await applyBtn.isVisible().catch(() => false)) {
-      await applyBtn.click()
-      await page.waitForTimeout(2000)
-      console.log(`  📨 申請完了: ${name}`)
-      return true
-    } else {
-      const content = await page.content()
-      if (content.includes('提携中')) {
-        console.log(`  ✅ 既に提携中: ${name}`)
-        return false
+    const applySelectors = [
+      'input[value*="申請"]',
+      'input[value*="提携"]',
+      'button:has-text("申請")',
+      'a:has-text("提携申請")',
+      'a:has-text("参加申請")',
+    ]
+
+    for (const sel of applySelectors) {
+      const btn = page.locator(sel).first()
+      if (await btn.isVisible().catch(() => false)) {
+        await btn.click()
+        await page.waitForTimeout(3000)
+        console.log(`    📨 申請完了: ${name}`)
+        return 'applied'
       }
-      console.log(`  ⚠️ 申請ボタンが見つからない: ${name}`)
-      return false
     }
+
+    console.log(`    ⚠️ 申請ボタン未発見: ${name}`)
+    return 'no_button'
   } catch (e) {
-    console.warn(`  ❌ 申請エラー (${name}): ${e.message}`)
-    return false
+    console.warn(`    ❌ 申請エラー (${name}): ${e.message}`)
+    return 'error'
   }
 }
 
-// affiliates.jsonを更新
-function updateAffiliates(updates) {
-  const path = join(ROOT, 'src/data/affiliates.json')
-  const affiliates = JSON.parse(readFileSync(path, 'utf-8'))
+// affiliates.json を更新
+function updateAffiliatesJson(id, textLink) {
+  const filePath = join(ROOT, 'src/data/affiliates.json')
+  const affiliates = JSON.parse(readFileSync(filePath, 'utf-8'))
+  const target = affiliates.find(a => a.id === id)
+  if (!target) return false
 
-  let changed = false
-  for (const [id, data] of Object.entries(updates)) {
-    const target = affiliates.find(a => a.id === id)
-    if (target) {
-      Object.assign(target, data)
-      changed = true
-    }
-  }
+  if (target.fallback_url === textLink) return false // 変更なし
 
-  if (changed) {
-    writeFileSync(path, JSON.stringify(affiliates, null, 2) + '\n')
-    console.log('✅ affiliates.json を更新しました')
-  }
-  return changed
+  target.fallback_url = textLink
+  writeFileSync(filePath, JSON.stringify(affiliates, null, 2) + '\n')
+  console.log(`  ✅ affiliates.json 更新: ${target.name}`)
+  return true
 }
 
-// simulatorページのアフィリエイトリンクを更新
-function updateSimulatorLink(url, name) {
-  const path = join(ROOT, 'src/app/simulator/page.tsx')
-  let content = readFileSync(path, 'utf-8')
+// simulator/page.tsx のアフィリエイトリンクを更新
+function updateSimulatorPage(url, name) {
+  const filePath = join(ROOT, 'src/app/simulator/page.tsx')
+  let content = readFileSync(filePath, 'utf-8')
 
-  const ctaBlock = `              <a
+  const newLink = `              <a
                 href="${url}"
                 target="_blank"
                 rel="nofollow noopener noreferrer"
@@ -222,50 +233,53 @@ function updateSimulatorLink(url, name) {
                 保険の無料相談を予約する（${name}）→
               </a>`
 
-  // プレースホルダーを置き換え
-  if (content.includes('※ 保険の無料相談サービスは近日公開予定です')) {
+  if (content.includes('近日公開予定')) {
     content = content.replace(
-      `              <p style={{ fontSize: 14, color: '#888', textAlign: 'center', margin: 0 }}>
-                ※ 保険の無料相談サービスは近日公開予定です
-              </p>`,
-      ctaBlock
+      /              <p style=\{\{ fontSize: 14, color: '#888', textAlign: 'center', margin: 0 \}\}>\n                ※ 保険の無料相談サービスは近日公開予定です\n              <\/p>/,
+      newLink
     )
-    writeFileSync(path, content)
-    console.log(`✅ simulator ページのリンクを更新 (${name})`)
-    return true
-  } else if (content.includes('px.a8.net')) {
-    // 既存のa8リンクを更新
-    content = content.replace(
-      /href="https:\/\/px\.a8\.net\/svt\/ejp\?a8mat=[^"]*"/,
-      `href="${url}"`
-    )
-    content = content.replace(
-      /保険の無料相談を予約する（[^）]+）/,
-      `保険の無料相談を予約する（${name}）`
-    )
-    writeFileSync(path, content)
-    console.log(`✅ simulator ページのリンクを更新 (${name})`)
+    writeFileSync(filePath, content)
+    console.log(`  ✅ simulator ページ更新: ${name}`)
     return true
   }
+
+  // 既存リンクを更新
+  if (content.includes('px.a8.net')) {
+    const updated = content
+      .replace(/href="https:\/\/px\.a8\.net\/svt\/ejp\?a8mat=[^"]*"/, `href="${url}"`)
+      .replace(/保険の無料相談を予約する（[^）]+）/, `保険の無料相談を予約する（${name}）`)
+    if (updated !== content) {
+      writeFileSync(filePath, updated)
+      console.log(`  ✅ simulator ページ更新（リンク差替）: ${name}`)
+      return true
+    }
+  }
+
   return false
 }
 
 // git commit & push
 function gitPush(message) {
   try {
-    execSync('git add src/data/affiliates.json src/app/simulator/page.tsx', { cwd: ROOT })
-    execSync(`git commit -m "${message}"`, { cwd: ROOT })
-    execSync('git push origin main', { cwd: ROOT })
-    console.log('✅ Git push 完了')
+    execSync('git add src/data/affiliates.json src/app/simulator/page.tsx', { cwd: ROOT, stdio: 'pipe' })
+    const diff = execSync('git diff --staged --stat', { cwd: ROOT }).toString().trim()
+    if (!diff) {
+      console.log('  ℹ️  git: 変更なし')
+      return
+    }
+    execSync(`git commit -m "${message}"`, { cwd: ROOT, stdio: 'pipe' })
+    execSync('git pull --rebase origin main', { cwd: ROOT, stdio: 'pipe' })
+    execSync('git push origin main', { cwd: ROOT, stdio: 'pipe' })
+    console.log('  ✅ git push 完了')
   } catch (e) {
-    console.warn('⚠️ git push エラー（変更なしの可能性）:', e.message.split('\n')[0])
+    console.warn('  ⚠️ git エラー:', e.message.split('\n')[0])
   }
 }
 
 async function main() {
-  console.log('='.repeat(50))
-  console.log('🤖 A8.net 自動管理スクリプト開始')
-  console.log('='.repeat(50))
+  console.log('='.repeat(55))
+  console.log('🤖 A8.net 自動管理スクリプト v2 開始')
+  console.log('='.repeat(55))
 
   const browser = await chromium.launch({ headless: true })
   const context = await browser.newContext({
@@ -276,82 +290,76 @@ async function main() {
   try {
     await login(page)
 
-    const affiliates = JSON.parse(readFileSync(join(ROOT, 'src/data/affiliates.json'), 'utf-8'))
-    const updates = {}
-    let simulatorUpdated = false
+    // ── STEP 1: 提携済みプログラム一覧を取得 ──
+    const linkedPrograms = await getLinkedPrograms(page)
+    const linkedInsIds = new Set(linkedPrograms.map(p => p.insId))
 
-    // ── STEP 1: 既存提携プログラムのリンク取得 ──
-    console.log('\n📋 STEP 1: 提携済みプログラムのリンク確認')
+    const affiliates = JSON.parse(readFileSync(join(ROOT, 'src/data/affiliates.json'), 'utf-8'))
+    let anyChanged = false
+
+    // ── STEP 2: 各ターゲットのリンクを取得 ──
+    console.log('\n🔗 STEP 2: テキストリンク取得')
     for (const aff of affiliates) {
       if (!aff.a8_ins_id) continue
 
-      console.log(`\n🔍 ${aff.name} (${aff.a8_ins_id})`)
-      const status = await checkProgramStatus(page, aff.a8_ins_id)
-      console.log(`  ステータス: ${status}`)
-
-      if (status === 'approved') {
-        const link = await getTextLink(page, aff.a8_ins_id)
+      if (linkedInsIds.has(aff.a8_ins_id)) {
+        console.log(`\n  ${aff.name} → 提携済み`)
+        const link = await getTextLink(page, aff.a8_ins_id, aff.name)
         if (link) {
-          console.log(`  ✅ テキストリンク取得: ${link.substring(0, 60)}...`)
-          updates[aff.id] = { ...aff, fallback_url: link }
+          const changed = updateAffiliatesJson(aff.id, link)
+          if (changed) anyChanged = true
 
-          // 保険系プログラムはsimulatorにも反映
+          // 保険系プログラムはsimulatorページにも反映
           if (aff.id === 'hoken-minaoshi' || aff.id === 'money-doctor') {
-            if (!simulatorUpdated) {
-              simulatorUpdated = updateSimulatorLink(link, aff.name)
-            }
+            const simChanged = updateSimulatorPage(link, aff.name)
+            if (simChanged) anyChanged = true
           }
-        } else {
-          console.log('  ⚠️ テキストリンク未取得')
         }
+      } else {
+        console.log(`\n  ${aff.name} → 未提携（審査中または申請待ち）`)
       }
     }
 
-    // ── STEP 2: 新規優良プログラムを探して申請 ──
-    console.log('\n\n🔎 STEP 2: 新規優良プログラム探索')
-    const applied = new Set(affiliates.map(a => a.a8_ins_id).filter(Boolean))
-    const newApplications = []
+    // ── STEP 3: 新規プログラム探索・申請 ──
+    console.log('\n\n🔎 STEP 3: 新規優良プログラム探索・申請')
+    const knownInsIds = new Set([
+      ...linkedInsIds,
+      ...affiliates.map(a => a.a8_ins_id).filter(Boolean),
+    ])
 
     for (const target of SEARCH_TARGETS) {
-      console.log(`\n  検索: "${target.keyword}" (最低報酬: ${target.minReward}円)`)
-      const programs = await searchPrograms(page, target.keyword, target.minReward)
+      console.log(`\n  検索: "${target.keyword}"`)
+      const found = await searchProgram(page, target.keyword)
 
-      for (const prog of programs.slice(0, 3)) { // 上位3件のみ
-        if (applied.has(prog.insId)) {
-          console.log(`  ⏭️  ${prog.name}: 申請済み`)
+      if (found.length === 0) {
+        console.log(`    該当なし`)
+        continue
+      }
+
+      for (const prog of found.slice(0, 5)) {
+        if (knownInsIds.has(prog.insId)) {
+          console.log(`    ⏭️  ${prog.name} (${prog.insId}): 申請済み`)
           continue
         }
-        console.log(`  📌 新規発見: ${prog.name} | 報酬:${prog.reward}円 | EPC:${prog.epc}`)
-        const success = await applyProgram(page, prog.insId, prog.name)
-        if (success) {
-          newApplications.push({ ...prog, category: target.category })
-          applied.add(prog.insId)
+        console.log(`    📌 新規: ${prog.name} (${prog.insId})`)
+        const result = await applyProgram(page, prog.insId, prog.name)
+        if (result === 'applied') {
+          knownInsIds.add(prog.insId)
         }
       }
     }
 
-    if (newApplications.length > 0) {
-      console.log(`\n📨 新規申請: ${newApplications.length}件`)
-      newApplications.forEach(p => console.log(`  - ${p.name} (${p.insId})`))
-    }
-
-    // ── STEP 3: 更新をファイルに反映してpush ──
-    console.log('\n\n💾 STEP 3: ファイル更新 & Git push')
-    const affiliatesChanged = updateAffiliates(updates)
-
-    if (affiliatesChanged || simulatorUpdated) {
-      gitPush('auto: update affiliate links via A8.net automation')
-    } else {
-      console.log('ℹ️  更新なし（提携承認待ちのプログラムあり）')
-    }
+    // ── STEP 4: Git push ──
+    console.log('\n\n💾 STEP 4: Git push')
+    gitPush(`auto: A8アフィリエイトリンク更新 ${new Date().toISOString().slice(0, 10)}`)
 
   } finally {
     await browser.close()
   }
 
-  console.log('\n' + '='.repeat(50))
-  console.log('✅ 自動管理スクリプト完了')
-  console.log('='.repeat(50))
+  console.log('\n' + '='.repeat(55))
+  console.log('✅ 完了')
+  console.log('='.repeat(55))
 }
 
 main().catch(e => { console.error('❌ エラー:', e.message); process.exit(1) })
