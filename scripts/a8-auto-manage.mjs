@@ -163,29 +163,44 @@ async function searchProgram(page, keyword) {
 
     const programs = await page.evaluate(() => {
       const results = []
+      const html = document.body.innerHTML
+      const text = document.body.innerText
 
-      // insId= を含むリンクを全て収集
-      const links = document.querySelectorAll('a[href*="insId="]')
-      links.forEach(link => {
+      // 方法1: href に insId= を含むリンク
+      document.querySelectorAll('a').forEach(link => {
         const href = link.getAttribute('href') || ''
-        const insIdMatch = href.match(/insId=(s\d+)/)
-        if (insIdMatch) {
-          const name = link.textContent.trim()
-          if (name && name.length > 1) {
-            results.push({ name, insId: insIdMatch[1] })
-          }
+        const onclick = link.getAttribute('onclick') || ''
+        const combined = href + onclick
+        const m = combined.match(/insId=(s\d+)/)
+        if (m) {
+          results.push({ name: link.textContent.trim(), insId: m[1] })
         }
       })
 
-      // ECID: パターンからも収集
-      const html = document.body.innerHTML
-      const ecidPattern = /ECID:(s\d+)/g
+      // 方法2: ECID:sXXX パターン（ページ内テキスト）
+      const ecidRe = /ECID:(s\d{11,15})/g
       let m
-      while ((m = ecidPattern.exec(html)) !== null) {
+      while ((m = ecidRe.exec(html)) !== null) {
         if (!results.find(r => r.insId === m[1])) {
-          results.push({ name: `(insId: ${m[1]})`, insId: m[1] })
+          results.push({ name: `(ECID: ${m[1]})`, insId: m[1] })
         }
       }
+
+      // 方法3: プログラムID: sXXX パターン（テーブルの表示テキスト）
+      const pidRe = /プログラムID[^\n]*(s\d{11,15})/g
+      while ((m = pidRe.exec(text)) !== null) {
+        if (!results.find(r => r.insId === m[1])) {
+          results.push({ name: `(プログラムID: ${m[1]})`, insId: m[1] })
+        }
+      }
+
+      // 方法4: data属性
+      document.querySelectorAll('[data-ins-id], [data-insid], [data-program-id]').forEach(el => {
+        const id = el.getAttribute('data-ins-id') || el.getAttribute('data-insid') || el.getAttribute('data-program-id')
+        if (id && /^s\d+$/.test(id)) {
+          results.push({ name: el.textContent.trim().slice(0, 30), insId: id })
+        }
+      })
 
       return [...new Map(results.map(r => [r.insId, r])).values()]
     })
@@ -196,8 +211,20 @@ async function searchProgram(page, keyword) {
       return m ? parseInt(m[1]) : null
     })
 
-    if (resultCount !== null) console.log(`    該当件数: ${resultCount}件, insId取得: ${programs.length}件`)
-    else if (programs.length === 0) {
+    if (resultCount !== null) {
+      console.log(`    該当件数: ${resultCount}件, insId取得: ${programs.length}件`)
+      if (resultCount > 0 && programs.length === 0) {
+        // 結果はあるがinsId取れない場合、HTMLを一部ダンプ
+        const htmlSnippet = await page.evaluate(() => {
+          const body = document.body.innerHTML
+          // insId関連のHTML断片を探す
+          const idx = body.indexOf('s00000')
+          if (idx >= 0) return body.slice(Math.max(0, idx-100), idx+200)
+          return body.slice(0, 500)
+        })
+        console.log(`    HTMLデバッグ: ${htmlSnippet.replace(/\s+/g, ' ').slice(0, 300)}`)
+      }
+    } else if (programs.length === 0) {
       const snippet = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' ').slice(0, 150))
       console.log(`    結果なし | ページ: ${snippet}`)
     }
