@@ -53,10 +53,21 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     ],
   }
 
+  const faqLd = article.faqs && article.faqs.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: article.faqs.map(f => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  } : null
+
   return (
     <div className="min-h-screen" style={{ background: '#f8f7f4' }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      {faqLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />}
 
       {/* ヘッダー */}
       <header style={{ background: '#1a3a6b' }}>
@@ -145,6 +156,26 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             </section>
           ))}
         </div>
+
+        {/* よくある質問 */}
+        {article.faqs && article.faqs.length > 0 && (
+          <div style={{ marginTop: 40 }}>
+            <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1a1a1a', borderLeft: `4px solid ${colors.border}`, paddingLeft: 14, marginBottom: 16 }}>
+              よくある質問
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {article.faqs.map((faq, i) => (
+                <details key={i} style={{ background: 'white', border: '1px solid #ddd', borderRadius: 12, padding: '16px 20px' }}>
+                  <summary style={{ fontWeight: 700, fontSize: 16, color: '#1a1a1a', cursor: 'pointer', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Q. {faq.q}</span>
+                    <span style={{ color: colors.border, fontSize: 20, flexShrink: 0, marginLeft: 12 }}>＋</span>
+                  </summary>
+                  <p style={{ marginTop: 12, color: '#444', fontSize: 15, lineHeight: 1.8 }}>A. {faq.a}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* アフィリエイトバナー */}
         <AffiliateBanners />

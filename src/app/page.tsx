@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import AdUnit from '@/components/AdUnit'
+import { getAllArticles } from '@/lib/articles'
 
 const TOPICS = [
   {
@@ -42,6 +43,9 @@ const POPULAR = [
 ]
 
 export default function HomePage() {
+  const recentArticles = getAllArticles()
+    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
+    .slice(0, 6)
   return (
     <div className="min-h-screen" style={{ background: '#f8f7f4' }}>
 
@@ -149,6 +153,39 @@ export default function HomePage() {
         </section>
 
         <AdUnit slot="5678901234" format="auto" />
+
+        {/* 新着記事 */}
+        <section className="mt-10">
+          <h2 className="text-xl font-bold mb-4" style={{ color: '#1a1a1a' }}>新着記事</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {recentArticles.map(a => (
+              <Link
+                key={a.slug}
+                href={`/article/${a.slug}`}
+                style={{
+                  background: 'white',
+                  border: '1px solid #ddd',
+                  borderRadius: 12,
+                  padding: '14px 18px',
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                }}
+              >
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 15, color: '#1a1a1a', fontWeight: 600, marginBottom: 2 }}>{a.title}</p>
+                  <p style={{ fontSize: 12, color: '#999' }}>{a.publishedAt} · {a.category === 'nenkin' ? '年金' : a.category === 'souzoku' ? '相続' : '介護'}</p>
+                </div>
+                <span style={{ color: '#aaa', fontSize: 20, flexShrink: 0 }}>›</span>
+              </Link>
+            ))}
+          </div>
+          <div style={{ marginTop: 12, textAlign: 'center' }}>
+            <Link href="/nenkin" style={{ color: '#2a5298', fontSize: 14, textDecoration: 'none' }}>すべての記事を見る →</Link>
+          </div>
+        </section>
 
         {/* 信頼バッジ */}
         <section className="mt-10" style={{ background: 'white', borderRadius: 16, border: '1px solid #ddd', padding: '20px 24px' }}>

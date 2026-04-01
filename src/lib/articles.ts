@@ -6,6 +6,11 @@ export type ArticleSection = {
   body: string
 }
 
+export type ArticleFAQ = {
+  q: string
+  a: string
+}
+
 export type Article = {
   slug: string
   category: 'nenkin' | 'souzoku' | 'kaigo'
@@ -15,6 +20,7 @@ export type Article = {
   keywords: string[]
   publishedAt: string
   relatedSlugs?: string[]
+  faqs?: ArticleFAQ[]
 }
 
 const ARTICLES_DIR = path.join(process.cwd(), 'src/data/articles')
