@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://nenkin-guide.vercel.app/sitemap.xml
+Sitemap: https://nenkin-guide.jp/sitemap.xml
