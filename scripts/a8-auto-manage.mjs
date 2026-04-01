@@ -67,19 +67,52 @@ async function getLinkedPrograms(page) {
 
   const programs = await page.evaluate(() => {
     const results = []
-    const links = document.querySelectorAll('a[href*="insId="]')
-    links.forEach(link => {
-      const href = link.getAttribute('href') || ''
-      const insIdMatch = href.match(/insId=(s\d+)/)
-      if (insIdMatch) {
-        const name = link.textContent.trim()
-        if (name) {
-          results.push({ name, insId: insIdMatch[1], href })
-        }
+
+    // 方法1: id="pg-sXXXX" パターン（検索結果と同じ構造の可能性）
+    document.querySelectorAll('[id^="pg-s"]').forEach(el => {
+      const insId = el.id.replace('pg-', '')
+      if (/^s\d+$/.test(insId)) {
+        const nameEl = el.querySelector('h2, h3, h4, a')
+        results.push({ name: nameEl ? nameEl.textContent.trim() : insId, insId })
       }
     })
+
+    // 方法2: href に insId= を含むリンク
+    if (results.length === 0) {
+      document.querySelectorAll('a[href*="insId="], a[href*="linkAction"]').forEach(link => {
+        const href = link.getAttribute('href') || ''
+        const m = href.match(/insId=(s\d+)/)
+        if (m) {
+          results.push({ name: link.textContent.trim(), insId: m[1] })
+        }
+      })
+    }
+
+    // 方法3: onclick や data属性
+    if (results.length === 0) {
+      document.querySelectorAll('[onclick*="insId"], [data-ins-id]').forEach(el => {
+        const src = el.getAttribute('onclick') || el.getAttribute('data-ins-id') || ''
+        const m = src.match(/insId=(s\d+)/) || (src.match(/^s\d+$/) && [null, src])
+        if (m) {
+          results.push({ name: el.textContent.trim().slice(0, 40), insId: m[1] })
+        }
+      })
+    }
+
     return [...new Map(results.map(r => [r.insId, r])).values()]
   })
+
+  // デバッグ: 0件の場合はページ先頭のHTMLを確認
+  if (programs.length === 0) {
+    const debug = await page.evaluate(() => {
+      const body = document.body.innerHTML
+      // s00000 パターンを探す
+      const idx = body.indexOf('s00000')
+      if (idx >= 0) return `insId発見: ${body.slice(Math.max(0,idx-50), idx+150)}`
+      return `insId未発見 | ページ冒頭: ${document.body.innerText.slice(0, 200).replace(/\s+/g,' ')}`
+    })
+    console.log(`  デバッグ: ${debug}`)
+  }
 
   console.log(`  提携済み: ${programs.length}件`)
   programs.forEach(p => console.log(`    ✅ ${p.name} (${p.insId})`))
@@ -399,8 +432,23 @@ async function main() {
         }
         console.log(`    📌 新規: ${prog.name} (${prog.insId})`)
         const result = await applyProgram(page, prog.insId, prog.name)
-        if (result === 'applied') {
+        if (result === 'applied' || result === 'already_linked') {
           knownInsIds.add(prog.insId)
+          // 提携済みプログラムのテキストリンクも取得
+          if (result === 'already_linked') {
+            const link = await getTextLink(page, prog.insId, prog.name)
+            if (link) {
+              console.log(`    🔗 リンク取得済み: ${prog.name}`)
+              // affiliates.jsonに存在しない場合は新規追加（保険系のみsimulatorに反映）
+              const isInsurance = ['保険', 'ほけん', 'hoken', 'FP', 'マネー'].some(k =>
+                prog.name.toLowerCase().includes(k.toLowerCase())
+              )
+              if (isInsurance) {
+                const simChanged = updateSimulatorPage(link, prog.name)
+                if (simChanged) anyChanged = true
+              }
+            }
+          }
         }
       }
     }
