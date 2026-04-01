@@ -60,8 +60,13 @@ export default function NenkinPage() {
 
       <footer className="mt-12 py-8 px-4" style={{ background: '#222' }}>
         <div className="max-w-3xl mx-auto text-center">
-          <Link href="/" style={{ color: '#aaa', fontSize: 14, textDecoration: 'none' }}>← トップへ戻る</Link>
-          <p style={{ color: '#777', fontSize: 12, marginTop: 12 }}>© 2026 年金・相続・介護の手続きガイド</p>
+          <div style={{ display: 'flex', gap: 24, justifyContent: 'center', marginBottom: 12, flexWrap: 'wrap' }}>
+            <Link href="/" style={{ color: '#aaa', fontSize: 14, textDecoration: 'none' }}>← トップへ戻る</Link>
+            <Link href="/about" style={{ color: '#aaa', fontSize: 14, textDecoration: 'none' }}>運営者情報</Link>
+            <Link href="/privacy" style={{ color: '#aaa', fontSize: 14, textDecoration: 'none' }}>プライバシーポリシー</Link>
+            <Link href="/contact" style={{ color: '#aaa', fontSize: 14, textDecoration: 'none' }}>お問い合わせ</Link>
+          </div>
+          <p style={{ color: '#777', fontSize: 12 }}>© 2026 年金・相続・介護の手続きガイド</p>
         </div>
       </footer>
     </div>

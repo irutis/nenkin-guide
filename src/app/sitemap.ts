@@ -16,6 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/simulator`, lastModified: today, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${baseUrl}/about`, lastModified: today, changeFrequency: 'monthly', priority: 0.3 },
     { url: `${baseUrl}/privacy`, lastModified: today, changeFrequency: 'monthly', priority: 0.3 },
+    { url: `${baseUrl}/contact`, lastModified: today, changeFrequency: 'monthly', priority: 0.3 },
   ]
 
   const articles = getAllArticles()

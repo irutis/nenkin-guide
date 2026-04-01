@@ -175,6 +175,7 @@ export default function HomePage() {
           <div className="flex flex-wrap gap-6 mb-4 justify-center">
             <Link href="/about" style={{ color: '#aaa', fontSize: 14, textDecoration: 'none' }}>運営者情報</Link>
             <Link href="/privacy" style={{ color: '#aaa', fontSize: 14, textDecoration: 'none' }}>プライバシーポリシー</Link>
+            <Link href="/contact" style={{ color: '#aaa', fontSize: 14, textDecoration: 'none' }}>お問い合わせ</Link>
           </div>
           <p className="text-center" style={{ color: '#777', fontSize: 12 }}>
             © 2026 年金・相続・介護の手続きガイド｜本サイトの情報は参考情報です。詳細は各機関にご確認ください。

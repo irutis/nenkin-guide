@@ -31,8 +31,32 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const categoryLabel = CATEGORY_LABELS[article.category]
   const categoryHref = `/${article.category}`
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: article.title,
+    description: article.description,
+    datePublished: article.publishedAt,
+    dateModified: article.publishedAt,
+    author: { '@type': 'Organization', name: 'SOURO', url: 'https://nenkin-guide.jp' },
+    publisher: { '@type': 'Organization', name: '年金・相続・介護の手続きガイド', url: 'https://nenkin-guide.jp' },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `https://nenkin-guide.jp/article/${article.slug}` },
+  }
+
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'ホーム', item: 'https://nenkin-guide.jp' },
+      { '@type': 'ListItem', position: 2, name: categoryLabel, item: `https://nenkin-guide.jp${categoryHref}` },
+      { '@type': 'ListItem', position: 3, name: article.title, item: `https://nenkin-guide.jp/article/${article.slug}` },
+    ],
+  }
+
   return (
     <div className="min-h-screen" style={{ background: '#f8f7f4' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
       {/* ヘッダー */}
       <header style={{ background: '#1a3a6b' }}>
