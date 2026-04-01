@@ -136,14 +136,9 @@ export default function SimulatorPage() {
               <p style={{ fontSize: 14, color: '#555', marginBottom: 14, lineHeight: 1.7 }}>
                 年金だけでは老後の生活費が不足するケースも。保険の専門家に無料で相談して、今から備えましょう。
               </p>
-              <a
-                href="https://px.a8.net/svt/ejp?a8mat=4AZR8P+BBTY5U+3SPO+9FL80Y"
-                target="_blank"
-                rel="nofollow noopener noreferrer"
-                style={{ display: 'block', background: '#1a3a6b', color: 'white', fontWeight: 700, fontSize: 16, padding: '14px', borderRadius: 10, textDecoration: 'none', textAlign: 'center' }}
-              >
-                保険の無料相談を予約する（保険見直し本舗）→
-              </a>
+              <p style={{ fontSize: 14, color: '#888', textAlign: 'center', margin: 0 }}>
+                ※ 保険の無料相談サービスは近日公開予定です
+              </p>
             </div>
           </div>
         )}
