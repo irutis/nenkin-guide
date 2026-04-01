@@ -147,21 +147,7 @@ async function getTextLink(page, insId, name) {
       return match[0]
     }
 
-    // デバッグ: ページの実際の構造を確認
-    const debugInfo = await page.evaluate(() => {
-      const url = window.location.href
-      const hasTextarea = document.querySelectorAll('textarea').length
-      const textareaVals = Array.from(document.querySelectorAll('textarea')).map(t => t.value.slice(0, 100))
-      const hasA8Links = document.body.innerHTML.includes('a8.net')
-      const a8matIdx = document.body.innerHTML.indexOf('a8mat')
-      const snippet = a8matIdx >= 0
-        ? document.body.innerHTML.slice(a8matIdx, a8matIdx + 200)
-        : document.body.innerText.slice(0, 200).replace(/\s+/g, ' ')
-      return { url, hasTextarea, textareaVals, hasA8Links, snippet }
-    })
-    console.log(`    ⚠️ ${name}: テキストリンク未取得 | url=${debugInfo.url.slice(-50)} | textarea数=${debugInfo.hasTextarea} | a8Links=${debugInfo.hasA8Links}`)
-    if (debugInfo.hasTextarea > 0) console.log(`    textareaの値: ${JSON.stringify(debugInfo.textareaVals)}`)
-    console.log(`    ページ内容: ${debugInfo.snippet.slice(0, 200)}`)
+    console.log(`    ⚠️ ${name}: リンク未取得（未承認または審査中）`)
     return null
   } catch (e) {
     console.warn(`    ❌ ${name} リンク取得エラー: ${e.message}`)
