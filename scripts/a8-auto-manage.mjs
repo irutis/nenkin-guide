@@ -163,46 +163,20 @@ async function searchProgram(page, keyword) {
 
     const programs = await page.evaluate(() => {
       const results = []
-      const html = document.body.innerHTML
-      const text = document.body.innerText
 
-      // 方法1: href に insId= を含むリンク
-      document.querySelectorAll('a').forEach(link => {
-        const href = link.getAttribute('href') || ''
-        const onclick = link.getAttribute('onclick') || ''
-        const combined = href + onclick
-        const m = combined.match(/insId=(s\d+)/)
-        if (m) {
-          results.push({ name: link.textContent.trim(), insId: m[1] })
-        }
+      // A8検索結果は id="pg-sXXXXX" という div に格納されている
+      document.querySelectorAll('[id^="pg-s"]').forEach(el => {
+        const insId = el.id.replace('pg-', '')
+        if (!/^s\d+$/.test(insId)) return
+
+        // プログラム名を取得（pgList内の最初のリンクテキスト or h3/h4）
+        const nameEl = el.querySelector('h2, h3, h4, .pgName, .programName, a[href*="programDetail"], a[href*="insId"]')
+        const name = nameEl ? nameEl.textContent.trim() : insId
+
+        results.push({ name: name || insId, insId })
       })
 
-      // 方法2: ECID:sXXX パターン（ページ内テキスト）
-      const ecidRe = /ECID:(s\d{11,15})/g
-      let m
-      while ((m = ecidRe.exec(html)) !== null) {
-        if (!results.find(r => r.insId === m[1])) {
-          results.push({ name: `(ECID: ${m[1]})`, insId: m[1] })
-        }
-      }
-
-      // 方法3: プログラムID: sXXX パターン（テーブルの表示テキスト）
-      const pidRe = /プログラムID[^\n]*(s\d{11,15})/g
-      while ((m = pidRe.exec(text)) !== null) {
-        if (!results.find(r => r.insId === m[1])) {
-          results.push({ name: `(プログラムID: ${m[1]})`, insId: m[1] })
-        }
-      }
-
-      // 方法4: data属性
-      document.querySelectorAll('[data-ins-id], [data-insid], [data-program-id]').forEach(el => {
-        const id = el.getAttribute('data-ins-id') || el.getAttribute('data-insid') || el.getAttribute('data-program-id')
-        if (id && /^s\d+$/.test(id)) {
-          results.push({ name: el.textContent.trim().slice(0, 30), insId: id })
-        }
-      })
-
-      return [...new Map(results.map(r => [r.insId, r])).values()]
+      return results
     })
 
     const resultCount = await page.evaluate(() => {
