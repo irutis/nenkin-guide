@@ -125,27 +125,43 @@ async function getTextLink(page, insId, name) {
 // キーワード検索でプログラムを探す
 async function searchProgram(page, keyword) {
   try {
+    // media/searchAction/keyword.do が正しい検索URL
     await page.goto(
-      `https://pub.a8.net/a8v2/program/programListAction.do?searchWord=${encodeURIComponent(keyword)}&genreId=&pageNo=1`,
+      `https://pub.a8.net/a8v2/media/searchAction/keyword.do?keyword=${encodeURIComponent(keyword)}`,
       { waitUntil: 'networkidle', timeout: 60000 }
     )
     await page.waitForTimeout(2000)
 
     const programs = await page.evaluate(() => {
       const results = []
-      const links = document.querySelectorAll('a[href*="insId="]')
+
+      // insId= を含むリンクを全て収集
+      const links = document.querySelectorAll('a[href*="insId="], a[href*="programDetail"]')
       links.forEach(link => {
         const href = link.getAttribute('href') || ''
         const insIdMatch = href.match(/insId=(s\d+)/)
         if (insIdMatch) {
           const name = link.textContent.trim()
-          if (name && name.length > 1) {
-            results.push({ name, insId: insIdMatch[1], href })
+          if (name && name.length > 1 && !name.includes('詳細') && !name.includes('広告')) {
+            results.push({ name, insId: insIdMatch[1] })
           }
         }
       })
+
+      // ECID: パターンからも取得（ページ内テキスト）
+      const html = document.body.innerHTML
+      const ecidMatches = html.matchAll(/\[ECID:(s\d+)\][^<]*<\/[^>]+>\s*([^<\n]{2,40})/g)
+      for (const m of ecidMatches) {
+        results.push({ name: m[2].trim(), insId: m[1] })
+      }
+
       return [...new Map(results.map(r => [r.insId, r])).values()]
     })
+
+    if (programs.length === 0) {
+      const pageText = await page.evaluate(() => document.body.innerText.slice(0, 200))
+      console.log(`    ページ内容確認: ${pageText.replace(/\s+/g, ' ').slice(0, 100)}`)
+    }
 
     return programs
   } catch (e) {
