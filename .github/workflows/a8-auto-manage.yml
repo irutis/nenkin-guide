@@ -1,0 +1,45 @@
+name: A8.net 自動管理（リンク取得・新規申請）
+
+on:
+  schedule:
+    - cron: '0 1 * * *'  # 毎日 JST 10:00
+  workflow_dispatch:
+
+jobs:
+  a8-manage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Install Playwright + Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: A8.net 自動管理
+        env:
+          A8_LOGIN_ID: ${{ secrets.A8_LOGIN_ID }}
+          A8_PASSWORD: ${{ secrets.A8_PASSWORD }}
+        run: node scripts/a8-auto-manage.mjs
+
+      - name: 変更をコミット＆プッシュ
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/data/affiliates.json src/app/simulator/page.tsx
+          if git diff --staged --quiet; then
+            echo "ℹ️  変更なし（提携承認待ちの可能性あり）"
+          else
+            git commit -m "auto: A8アフィリエイトリンク更新 $(date '+%Y-%m-%d')"
+            git pull --rebase origin main
+            git push
+            echo "✅ 更新をpushしました"
+          fi
