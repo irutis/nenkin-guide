@@ -80,6 +80,16 @@ const KEYWORDS = [
   { category: 'kaigo', title: 'グループホームとは？認知症の方が入居できる施設の詳細', slug: 'group-home-toha', keywords: ['グループホーム', 'グループホーム 認知症'] },
   { category: 'kaigo', title: '訪問介護とは？サービス内容・費用・利用手順を解説', slug: 'houmon-kaigo-toha', keywords: ['訪問介護', '訪問介護 費用'] },
   { category: 'kaigo', title: '遠距離介護の現実｜仕事を辞めずに続けるための工夫', slug: 'enkyo-kaigo-kofu', keywords: ['遠距離介護', '仕事 介護 両立'] },
+
+  // Search Console 実績キーワード（2026-04 追加）
+  { category: 'nenkin', title: '年金の窓口はどこ？相談・手続きの場所と持ち物を完全解説', slug: 'nenkin-madoguchi-soudan', keywords: ['年金 窓口', '年金事務所 手続き', '年金 相談 どこ'] },
+  { category: 'nenkin', title: '年金はいつから受け取れる？受給開始年齢と手続きのタイミング', slug: 'nenkin-itsu-ukeru', keywords: ['年金 いつから', '年金 受給開始年齢', '年金 65歳'] },
+  { category: 'nenkin', title: '老後に必要なお金はいくら？年金だけでは足りない場合の備え方', slug: 'rogo-hitsuyou-okane', keywords: ['老後 必要なお金', '老後資金 いくら', '年金 足りない'] },
+  { category: 'nenkin', title: '年金の免除制度とは？申請方法と将来の受給額への影響', slug: 'nenkin-menjo-seido', keywords: ['年金 免除', '国民年金 免除 申請', '年金 免除 デメリット'] },
+  { category: 'souzoku', title: '相続で揉めないために｜家族でできる事前準備のポイント', slug: 'souzoku-momental-yobo', keywords: ['相続 トラブル 防ぐ', '相続 準備', '相続 家族 話し合い'] },
+  { category: 'souzoku', title: '親が認知症になったら財産はどう守る？成年後見制度の使い方', slug: 'ninchisho-zaisan-hogo', keywords: ['認知症 財産 管理', '成年後見制度', '親 認知症 お金'] },
+  { category: 'kaigo', title: '親の介護費用は誰が負担する？兄弟間での費用分担の考え方', slug: 'kaigo-hiyo-futan', keywords: ['介護費用 兄弟 分担', '介護 費用 誰が払う', '親の介護 お金'] },
+  { category: 'kaigo', title: '介護認定の「要介護」と「要支援」の違いとは？区分の見方', slug: 'kaigo-nintei-kaisetsu', keywords: ['要介護 要支援 違い', '介護認定 区分', '要介護1 要介護2 違い'] },
 ]
 
 async function generateArticle(keyword) {

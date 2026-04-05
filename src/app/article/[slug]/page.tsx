@@ -201,6 +201,62 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         {/* アフィリエイトバナー */}
         <AffiliateBanners />
 
+        {/* 年金カテゴリ：都道府県別ページへの誘導 */}
+        {article.category === 'nenkin' && (
+          <div style={{ background: '#eff4fb', border: '2px solid #1a3a6b', borderRadius: 14, padding: '20px 22px', marginTop: 36 }}>
+            <p style={{ fontWeight: 700, color: '#1a3a6b', fontSize: 18, marginBottom: 12 }}>
+              📍 お近くの年金事務所を探す
+            </p>
+            <p style={{ color: '#333', fontSize: 16, lineHeight: 1.7, marginBottom: 16 }}>
+              年金の相談・手続きはお住まいの都道府県の年金事務所へ。場所・電話番号・持ち物を都道府県別に案内しています。
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {[
+                ['tokyo', '東京'],['kanagawa', '神奈川'],['osaka', '大阪'],['aichi', '愛知'],
+                ['saitama', '埼玉'],['chiba', '千葉'],['hyogo', '兵庫'],['hokkaido', '北海道'],
+              ].map(([pref, label]) => (
+                <Link
+                  key={pref}
+                  href={`/nenkin/${pref}`}
+                  style={{
+                    background: 'white',
+                    border: '1px solid #a8c4e8',
+                    borderRadius: 8,
+                    padding: '8px 16px',
+                    fontSize: 16,
+                    color: '#1a3a6b',
+                    textDecoration: 'none',
+                    fontWeight: 600,
+                    minHeight: 44,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  {label}
+                </Link>
+              ))}
+              <Link
+                href="/nenkin"
+                style={{
+                  background: '#1a3a6b',
+                  border: '1px solid #1a3a6b',
+                  borderRadius: 8,
+                  padding: '8px 16px',
+                  fontSize: 16,
+                  color: 'white',
+                  textDecoration: 'none',
+                  fontWeight: 600,
+                  minHeight: 44,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                }}
+              >
+                すべての都道府県を見る →
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* 注意書き */}
         <div style={{ background: '#fff8e1', border: '1px solid #f5c518', borderRadius: 14, padding: '18px 22px', marginTop: 36 }}>
           <p style={{ fontSize: 16, color: '#7a5c00', lineHeight: 1.8, margin: 0 }}>
