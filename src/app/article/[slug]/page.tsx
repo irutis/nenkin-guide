@@ -71,12 +71,32 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
       {/* ヘッダー */}
       <header style={{ background: '#1a3a6b' }}>
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
-          <Link href="/" style={{ color: '#a8c4e8', fontSize: 14, textDecoration: 'none' }}>ホーム</Link>
-          <span style={{ color: '#a8c4e8' }}>›</span>
-          <Link href={categoryHref} style={{ color: '#a8c4e8', fontSize: 14, textDecoration: 'none' }}>{categoryLabel}</Link>
-          <span style={{ color: '#a8c4e8' }}>›</span>
-          <span style={{ color: 'white', fontSize: 14 }} className="truncate">{article.title}</span>
+        <div className="max-w-3xl mx-auto px-4 py-4">
+          {/* ホームに戻るボタン */}
+          <Link
+            href="/"
+            style={{
+              color: 'white',
+              fontSize: 16,
+              fontWeight: 700,
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              background: 'rgba(255,255,255,0.15)',
+              padding: '8px 16px',
+              borderRadius: 8,
+              marginBottom: 10,
+            }}
+          >
+            ← トップページに戻る
+          </Link>
+          {/* パンくず */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <Link href={categoryHref} style={{ color: '#a8c4e8', fontSize: 16, textDecoration: 'none' }}>{categoryLabel}</Link>
+            <span style={{ color: '#a8c4e8', fontSize: 16 }}>›</span>
+            <span style={{ color: 'white', fontSize: 15, lineHeight: 1.4 }}>{article.title}</span>
+          </div>
         </div>
       </header>
 
@@ -98,27 +118,27 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         </span>
 
         {/* タイトル */}
-        <h1 style={{ fontSize: 26, fontWeight: 700, color: '#1a1a1a', lineHeight: 1.45, marginBottom: 12 }}>
+        <h1 style={{ fontSize: 28, fontWeight: 700, color: '#1a1a1a', lineHeight: 1.45, marginBottom: 14 }}>
           {article.title}
         </h1>
 
-        <p style={{ color: '#555', fontSize: 16, marginBottom: 24, lineHeight: 1.7 }}>
+        <p style={{ color: '#444', fontSize: 18, marginBottom: 20, lineHeight: 1.8, background: '#f8f8f8', borderLeft: `4px solid ${colors.border}`, padding: '12px 16px', borderRadius: '0 8px 8px 0' }}>
           {article.description}
         </p>
 
         {/* 更新日 */}
-        <p style={{ color: '#999', fontSize: 13, marginBottom: 32 }}>
+        <p style={{ color: '#888', fontSize: 15, marginBottom: 28 }}>
           更新日：{article.publishedAt}
         </p>
 
         {/* 目次 */}
         {article.sections.length > 2 && (
-          <div style={{ background: '#f0f4f8', border: '1px solid #d0daea', borderRadius: 12, padding: '16px 20px', marginBottom: 32 }}>
-            <p style={{ fontWeight: 700, color: '#1a3a6b', marginBottom: 10, fontSize: 15 }}>この記事の目次</p>
-            <ol style={{ paddingLeft: 20, margin: 0 }}>
+          <div style={{ background: '#f0f4f8', border: '1px solid #d0daea', borderRadius: 14, padding: '20px 24px', marginBottom: 36 }}>
+            <p style={{ fontWeight: 700, color: '#1a3a6b', marginBottom: 14, fontSize: 18 }}>📋 この記事の目次</p>
+            <ol style={{ paddingLeft: 22, margin: 0 }}>
               {article.sections.map((s, i) => (
-                <li key={i} style={{ marginBottom: 6 }}>
-                  <a href={`#section-${i}`} style={{ color: '#2a5298', fontSize: 15, textDecoration: 'none' }}>
+                <li key={i} style={{ marginBottom: 10 }}>
+                  <a href={`#section-${i}`} style={{ color: '#2a5298', fontSize: 17, textDecoration: 'none', lineHeight: 1.5 }}>
                     {s.heading}
                   </a>
                 </li>
@@ -130,26 +150,25 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         {/* 本文 */}
         <div>
           {article.sections.map((s, i) => (
-            <section key={i} id={`section-${i}`} style={{ marginBottom: 36 }}>
+            <section key={i} id={`section-${i}`} style={{ marginBottom: 44 }}>
               <h2 style={{
-                fontSize: 20,
+                fontSize: 22,
                 fontWeight: 700,
                 color: '#1a1a1a',
-                borderLeft: `4px solid ${colors.border}`,
-                paddingLeft: 14,
-                marginBottom: 16,
+                borderLeft: `5px solid ${colors.border}`,
+                paddingLeft: 16,
+                marginBottom: 18,
                 lineHeight: 1.45,
               }}>
                 {s.heading}
               </h2>
-              <div style={{ fontSize: 17, lineHeight: 1.9, color: '#222' }}>
+              <div style={{ fontSize: 18, lineHeight: 1.95, color: '#222' }}>
                 {s.body.split('\n').map((line, j) => (
-                  <p key={j} style={{ marginBottom: line === '' ? 12 : 0 }}>
+                  <p key={j} style={{ marginBottom: line === '' ? 14 : 0 }}>
                     {line}
                   </p>
                 ))}
               </div>
-              {/* 記事の真ん中に広告を挿入 */}
               {i === Math.floor(article.sections.length / 2) - 1 && (
                 <AdUnit slot="3456789012" format="auto" />
               )}
@@ -159,18 +178,20 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
         {/* よくある質問 */}
         {article.faqs && article.faqs.length > 0 && (
-          <div style={{ marginTop: 40 }}>
-            <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1a1a1a', borderLeft: `4px solid ${colors.border}`, paddingLeft: 14, marginBottom: 16 }}>
+          <div style={{ marginTop: 48 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1a1a1a', borderLeft: `5px solid ${colors.border}`, paddingLeft: 16, marginBottom: 20 }}>
               よくある質問
             </h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {article.faqs.map((faq, i) => (
-                <details key={i} style={{ background: 'white', border: '1px solid #ddd', borderRadius: 12, padding: '16px 20px' }}>
-                  <summary style={{ fontWeight: 700, fontSize: 16, color: '#1a1a1a', cursor: 'pointer', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>Q. {faq.q}</span>
-                    <span style={{ color: colors.border, fontSize: 20, flexShrink: 0, marginLeft: 12 }}>＋</span>
+                <details key={i} style={{ background: 'white', border: `2px solid ${colors.border}20`, borderRadius: 14, padding: '18px 22px' }}>
+                  <summary style={{ fontWeight: 700, fontSize: 18, color: '#1a1a1a', cursor: 'pointer', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, minHeight: 36 }}>
+                    <span style={{ lineHeight: 1.5 }}>Q. {faq.q}</span>
+                    <span style={{ color: colors.border, fontSize: 24, flexShrink: 0, fontWeight: 700 }}>＋</span>
                   </summary>
-                  <p style={{ marginTop: 12, color: '#444', fontSize: 15, lineHeight: 1.8 }}>A. {faq.a}</p>
+                  <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #eee' }}>
+                    <p style={{ color: '#333', fontSize: 17, lineHeight: 1.9 }}>A. {faq.a}</p>
+                  </div>
                 </details>
               ))}
             </div>
@@ -181,8 +202,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         <AffiliateBanners />
 
         {/* 注意書き */}
-        <div style={{ background: '#fff8e1', border: '1px solid #f5c518', borderRadius: 12, padding: '16px 20px', marginTop: 32 }}>
-          <p style={{ fontSize: 14, color: '#7a5c00', lineHeight: 1.7, margin: 0 }}>
+        <div style={{ background: '#fff8e1', border: '1px solid #f5c518', borderRadius: 14, padding: '18px 22px', marginTop: 36 }}>
+          <p style={{ fontSize: 16, color: '#7a5c00', lineHeight: 1.8, margin: 0 }}>
             ⚠️ 本記事は一般的な情報提供を目的としています。個別の状況については、年金事務所・市区町村の窓口・専門家にご相談ください。
           </p>
         </div>
@@ -192,9 +213,9 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           const related = article.relatedSlugs!.map(s => getArticleBySlug(s)).filter(Boolean)
           if (related.length === 0) return null
           return (
-            <div style={{ marginTop: 40 }}>
-              <h2 style={{ fontSize: 18, fontWeight: 700, color: '#1a1a1a', marginBottom: 16 }}>関連記事</h2>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ marginTop: 48 }}>
+              <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1a1a1a', marginBottom: 18 }}>関連記事</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {related.map(r => (
                   <Link
                     key={r!.slug}
@@ -202,16 +223,18 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                     style={{
                       background: 'white',
                       border: '1px solid #ddd',
-                      borderRadius: 12,
-                      padding: '14px 18px',
+                      borderRadius: 14,
+                      padding: '18px 22px',
                       textDecoration: 'none',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
+                      minHeight: 68,
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
                     }}
                   >
-                    <span style={{ fontSize: 16, color: '#1a1a1a', fontWeight: 600 }}>{r!.title}</span>
-                    <span style={{ color: '#aaa', fontSize: 20, flexShrink: 0, marginLeft: 12 }}>›</span>
+                    <span style={{ fontSize: 17, color: '#1a1a1a', fontWeight: 600, lineHeight: 1.5 }}>{r!.title}</span>
+                    <span style={{ color: colors.border, fontSize: 24, flexShrink: 0, marginLeft: 12, fontWeight: 700 }}>›</span>
                   </Link>
                 ))}
               </div>
@@ -219,33 +242,60 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           )
         })()}
 
-        {/* カテゴリへ戻る */}
-        <div style={{ marginTop: 40, textAlign: 'center' }}>
+        {/* ナビゲーションボタン */}
+        <div style={{ marginTop: 48, display: 'flex', flexDirection: 'column', gap: 14 }}>
           <Link
             href={categoryHref}
             style={{
-              display: 'inline-block',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               background: colors.border,
               color: 'white',
               fontWeight: 700,
-              fontSize: 16,
-              padding: '14px 32px',
-              borderRadius: 12,
+              fontSize: 18,
+              padding: '18px 32px',
+              borderRadius: 14,
               textDecoration: 'none',
+              minHeight: 60,
+              textAlign: 'center',
             }}
           >
             ← {categoryLabel}の記事一覧へ
+          </Link>
+          <Link
+            href="/"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'white',
+              border: '2px solid #1a3a6b',
+              color: '#1a3a6b',
+              fontWeight: 700,
+              fontSize: 18,
+              padding: '18px 32px',
+              borderRadius: 14,
+              textDecoration: 'none',
+              minHeight: 60,
+              textAlign: 'center',
+            }}
+          >
+            🏠 トップページに戻る
           </Link>
         </div>
 
       </div>
 
       {/* フッター */}
-      <footer className="mt-12 py-8 px-4" style={{ background: '#222' }}>
+      <footer style={{ marginTop: 48, padding: '28px 16px', background: '#222' }}>
         <div className="max-w-3xl mx-auto text-center">
-          <Link href="/about" style={{ color: '#aaa', fontSize: 14, marginRight: 24, textDecoration: 'none' }}>運営者情報</Link>
-          <Link href="/privacy" style={{ color: '#aaa', fontSize: 14, textDecoration: 'none' }}>プライバシーポリシー</Link>
-          <p style={{ color: '#777', fontSize: 12, marginTop: 12 }}>© 2026 年金・相続・介護の手続きガイド</p>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 16, flexWrap: 'wrap' }}>
+            <Link href="/about" style={{ color: '#ccc', fontSize: 16, textDecoration: 'none' }}>運営者情報</Link>
+            <Link href="/privacy" style={{ color: '#ccc', fontSize: 16, textDecoration: 'none' }}>プライバシーポリシー</Link>
+            <Link href="/contact" style={{ color: '#ccc', fontSize: 16, textDecoration: 'none' }}>お問い合わせ</Link>
+          </div>
+          <p style={{ color: '#888', fontSize: 14 }}>© 2026 年金・相続・介護の手続きガイド</p>
         </div>
       </footer>
 

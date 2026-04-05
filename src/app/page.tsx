@@ -1,42 +1,45 @@
 import Link from 'next/link'
 import AdUnit from '@/components/AdUnit'
-import { getAllArticles } from '@/lib/articles'
+import { getAllArticles, CATEGORY_LABELS } from '@/lib/articles'
 
 const TOPICS = [
   {
     href: '/nenkin',
     emoji: '💴',
     title: '年金のこと',
-    desc: 'いくらもらえる？いつから？申請の方法',
+    desc: '「いくらもらえる？」「いつから？」「申請の方法は？」',
     borderColor: '#1a3a6b',
     bgColor: '#eff4fb',
     titleColor: '#1a3a6b',
+    arrowColor: '#1a3a6b',
   },
   {
     href: '/souzoku',
     emoji: '🏠',
     title: '相続・遺言のこと',
-    desc: '亡くなった後の手続き・遺言書の書き方',
+    desc: '「遺産の分け方は？」「遺言書の書き方は？」「相続税は？」',
     borderColor: '#1a5c2e',
     bgColor: '#f0f7f2',
     titleColor: '#1a5c2e',
+    arrowColor: '#1a5c2e',
   },
   {
     href: '/kaigo',
     emoji: '🤝',
     title: '介護のこと',
-    desc: '介護認定の申請・施設の選び方・費用',
+    desc: '「介護認定の申請は？」「施設はどう選ぶ？」「費用は？」',
     borderColor: '#7a4200',
     bgColor: '#fdf5eb',
     titleColor: '#7a4200',
+    arrowColor: '#7a4200',
   },
 ]
 
 const POPULAR = [
-  { href: '/simulator', text: '📊 年金受取額シミュレーター（無料）' },
+  { href: '/simulator', text: '📊 年金受取額シミュレーター（無料）', badge: 'おすすめ' },
   { href: '/article/nenkin-tsuki-ikura', text: '年金は月いくらもらえる？' },
   { href: '/article/nenkin-shinsei-houhou', text: '年金の受け取り申請方法' },
-  { href: '/article/nenkin-kurisage', text: '繰り下げ受給はお得？' },
+  { href: '/article/kokumin-kosei-chigai', text: '国民年金と厚生年金の違い' },
   { href: '/article/souzoku-nagare', text: '相続手続きの流れ（全体像）' },
   { href: '/article/yuigonsho-kakikata', text: '遺言書の書き方' },
   { href: '/article/sozokuzei-keisan', text: '相続税はいくら？計算方法' },
@@ -46,27 +49,42 @@ export default function HomePage() {
   const recentArticles = getAllArticles()
     .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
     .slice(0, 6)
+
   return (
     <div className="min-h-screen" style={{ background: '#f8f7f4' }}>
 
       {/* ヘッダー */}
       <header style={{ background: '#1a3a6b' }}>
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <p className="text-white font-bold text-lg leading-tight">年金・相続・介護</p>
-            <p style={{ color: '#a8c4e8' }} className="text-sm">手続きガイド</p>
+        <div className="max-w-3xl mx-auto px-4 py-4">
+          {/* サイト名 */}
+          <div className="mb-3">
+            <p className="text-white font-bold" style={{ fontSize: 22, lineHeight: 1.3 }}>年金・相続・介護</p>
+            <p style={{ color: '#a8c4e8', fontSize: 15 }}>手続きガイド｜わかりやすく解説</p>
           </div>
+          {/* ナビゲーション */}
           <nav className="flex gap-2">
             {[
-              { href: '/nenkin', label: '年金' },
-              { href: '/souzoku', label: '相続' },
-              { href: '/kaigo', label: '介護' },
+              { href: '/nenkin', label: '💴 年金' },
+              { href: '/souzoku', label: '🏠 相続' },
+              { href: '/kaigo', label: '🤝 介護' },
             ].map(n => (
               <Link
                 key={n.href}
                 href={n.href}
-                className="text-white text-sm px-3 rounded-lg hover:opacity-80 transition-opacity"
-                style={{ background: '#2a5298', minHeight: 36, display: 'flex', alignItems: 'center' }}
+                style={{
+                  background: '#2a5298',
+                  color: 'white',
+                  fontSize: 17,
+                  fontWeight: 700,
+                  padding: '10px 16px',
+                  borderRadius: 10,
+                  textDecoration: 'none',
+                  minHeight: 48,
+                  display: 'flex',
+                  alignItems: 'center',
+                  flex: 1,
+                  justifyContent: 'center',
+                }}
               >
                 {n.label}
               </Link>
@@ -76,25 +94,39 @@ export default function HomePage() {
       </header>
 
       {/* ヒーロー */}
-      <section style={{ background: '#1a3a6b' }} className="pb-10">
-        <div className="max-w-3xl mx-auto px-4 pt-8 text-center">
-          <h1 className="text-white font-bold text-2xl sm:text-3xl leading-snug mb-3">
+      <section style={{ background: '#1a3a6b' }} className="pb-8">
+        <div className="max-w-3xl mx-auto px-4 pt-6 text-center">
+          <h1 className="text-white font-bold" style={{ fontSize: 28, lineHeight: 1.4, marginBottom: 10 }}>
             60代・70代のための<br />手続きガイド
           </h1>
-          <p style={{ color: '#a8c4e8' }} className="text-base">
-            年金・相続・介護の手続きを<br className="sm:hidden" />やさしい言葉でわかりやすく解説します
+          <p style={{ color: '#c8d9f0', fontSize: 18, lineHeight: 1.8 }}>
+            年金・相続・介護の手続きを<br />
+            <strong style={{ color: 'white' }}>やさしい言葉</strong>でわかりやすく解説します
           </p>
+          <div style={{
+            background: 'rgba(255,255,255,0.12)',
+            borderRadius: 12,
+            padding: '12px 20px',
+            marginTop: 16,
+            fontSize: 16,
+            color: '#e0ecff',
+          }}>
+            ✅ すべて<strong style={{ color: 'white' }}>無料</strong>で読めます　✅ 難しい言葉は使いません
+          </div>
         </div>
       </section>
 
       <div className="max-w-3xl mx-auto px-4">
 
         {/* テーマ選択 */}
-        <section className="mt-8">
-          <h2 className="text-xl font-bold mb-4" style={{ color: '#1a1a1a' }}>
+        <section style={{ marginTop: 28 }}>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1a1a1a', marginBottom: 6 }}>
             何を知りたいですか？
           </h2>
-          <div className="grid grid-cols-1 gap-4">
+          <p style={{ fontSize: 16, color: '#666', marginBottom: 16 }}>
+            知りたいテーマをタップしてください
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {TOPICS.map((t) => (
               <Link
                 key={t.href}
@@ -105,31 +137,37 @@ export default function HomePage() {
                   borderWidth: 2,
                   borderStyle: 'solid',
                   borderRadius: 16,
-                  padding: '20px 24px',
+                  padding: '20px 20px',
                   display: 'flex',
                   alignItems: 'center',
                   gap: 16,
                   textDecoration: 'none',
-                  minHeight: 88,
+                  minHeight: 100,
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.06)',
                 }}
               >
-                <span style={{ fontSize: 40, lineHeight: 1 }}>{t.emoji}</span>
+                <span style={{ fontSize: 44, lineHeight: 1, flexShrink: 0 }}>{t.emoji}</span>
                 <div style={{ flex: 1 }}>
-                  <p style={{ fontWeight: 700, fontSize: 20, color: t.titleColor, lineHeight: 1.3 }}>{t.title}</p>
-                  <p style={{ color: '#555', fontSize: 15, marginTop: 4 }}>{t.desc}</p>
+                  <p style={{ fontWeight: 700, fontSize: 22, color: t.titleColor, lineHeight: 1.3, marginBottom: 6 }}>
+                    {t.title}
+                  </p>
+                  <p style={{ color: '#444', fontSize: 15, lineHeight: 1.6 }}>{t.desc}</p>
                 </div>
-                <span style={{ color: '#aaa', fontSize: 24, flexShrink: 0 }}>›</span>
+                <span style={{ color: t.arrowColor, fontSize: 28, flexShrink: 0, fontWeight: 700 }}>›</span>
               </Link>
             ))}
           </div>
         </section>
 
         {/* よく調べられていること */}
-        <section className="mt-10">
-          <h2 className="text-xl font-bold mb-4" style={{ color: '#1a1a1a' }}>
+        <section style={{ marginTop: 36 }}>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1a1a1a', marginBottom: 6 }}>
             よく調べられていること
           </h2>
-          <div style={{ background: 'white', borderRadius: 16, border: '1px solid #ddd', overflow: 'hidden' }}>
+          <p style={{ fontSize: 16, color: '#666', marginBottom: 16 }}>
+            多くの方が気にされている内容です
+          </p>
+          <div style={{ background: 'white', borderRadius: 16, border: '1px solid #ddd', overflow: 'hidden', boxShadow: '0 2px 6px rgba(0,0,0,0.05)' }}>
             {POPULAR.map((p, i) => (
               <Link
                 key={p.href}
@@ -142,11 +180,26 @@ export default function HomePage() {
                   borderTop: i > 0 ? '1px solid #eee' : 'none',
                   textDecoration: 'none',
                   color: '#1a1a1a',
-                  minHeight: 56,
+                  minHeight: 64,
+                  gap: 12,
                 }}
               >
-                <span style={{ fontSize: 16 }}>{p.text}</span>
-                <span style={{ color: '#aaa', fontSize: 20, flexShrink: 0, marginLeft: 12 }}>›</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1 }}>
+                  <span style={{ color: '#999', fontSize: 16, fontWeight: 700, minWidth: 24 }}>{i + 1}</span>
+                  <span style={{ fontSize: 17, lineHeight: 1.5 }}>{p.text}</span>
+                  {p.badge && (
+                    <span style={{
+                      background: '#e8f0fe',
+                      color: '#1a3a6b',
+                      fontSize: 13,
+                      fontWeight: 700,
+                      padding: '2px 8px',
+                      borderRadius: 20,
+                      flexShrink: 0,
+                    }}>{p.badge}</span>
+                  )}
+                </div>
+                <span style={{ color: '#1a3a6b', fontSize: 22, flexShrink: 0, fontWeight: 700 }}>›</span>
               </Link>
             ))}
           </div>
@@ -155,8 +208,10 @@ export default function HomePage() {
         <AdUnit slot="5678901234" format="auto" />
 
         {/* 新着記事 */}
-        <section className="mt-10">
-          <h2 className="text-xl font-bold mb-4" style={{ color: '#1a1a1a' }}>新着記事</h2>
+        <section style={{ marginTop: 36 }}>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1a1a1a', marginBottom: 16 }}>
+            新着記事
+          </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {recentArticles.map(a => (
               <Link
@@ -165,40 +220,72 @@ export default function HomePage() {
                 style={{
                   background: 'white',
                   border: '1px solid #ddd',
-                  borderRadius: 12,
-                  padding: '14px 18px',
+                  borderRadius: 14,
+                  padding: '16px 20px',
                   textDecoration: 'none',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   gap: 12,
+                  minHeight: 72,
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
                 }}
               >
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: 15, color: '#1a1a1a', fontWeight: 600, marginBottom: 2 }}>{a.title}</p>
-                  <p style={{ fontSize: 12, color: '#999' }}>{a.publishedAt} · {a.category === 'nenkin' ? '年金' : a.category === 'souzoku' ? '相続' : '介護'}</p>
+                  <p style={{ fontSize: 17, color: '#1a1a1a', fontWeight: 600, lineHeight: 1.5, marginBottom: 4 }}>{a.title}</p>
+                  <p style={{ fontSize: 14, color: '#888' }}>
+                    {a.publishedAt} ·&nbsp;
+                    <span style={{
+                      background: '#f0f4f8',
+                      color: '#1a3a6b',
+                      padding: '1px 8px',
+                      borderRadius: 10,
+                      fontSize: 13,
+                    }}>
+                      {CATEGORY_LABELS[a.category]}
+                    </span>
+                  </p>
                 </div>
-                <span style={{ color: '#aaa', fontSize: 20, flexShrink: 0 }}>›</span>
+                <span style={{ color: '#1a3a6b', fontSize: 22, flexShrink: 0, fontWeight: 700 }}>›</span>
               </Link>
             ))}
           </div>
-          <div style={{ marginTop: 12, textAlign: 'center' }}>
-            <Link href="/nenkin" style={{ color: '#2a5298', fontSize: 14, textDecoration: 'none' }}>すべての記事を見る →</Link>
+          <div style={{ marginTop: 16, textAlign: 'center' }}>
+            <Link
+              href="/nenkin"
+              style={{
+                color: '#2a5298',
+                fontSize: 17,
+                fontWeight: 700,
+                textDecoration: 'none',
+                padding: '12px 24px',
+                border: '2px solid #2a5298',
+                borderRadius: 10,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+              }}
+            >
+              すべての記事を見る →
+            </Link>
           </div>
         </section>
 
-        {/* 信頼バッジ */}
-        <section className="mt-10" style={{ background: 'white', borderRadius: 16, border: '1px solid #ddd', padding: '20px 24px' }}>
-          <p style={{ fontWeight: 700, color: '#555', fontSize: 14, marginBottom: 16 }}>このサイトについて</p>
-          <div className="grid grid-cols-3 gap-4 text-center">
+        {/* このサイトについて */}
+        <section style={{ marginTop: 36, background: 'white', borderRadius: 16, border: '1px solid #ddd', padding: '24px', boxShadow: '0 2px 6px rgba(0,0,0,0.05)' }}>
+          <p style={{ fontWeight: 700, color: '#1a3a6b', fontSize: 18, marginBottom: 16 }}>このサイトについて</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {[
-              { value: '無料', label: 'すべて無料で読める' },
-              { value: '公式', label: '厚労省・法務省の公式情報をもとに作成' },
-              { value: '簡単', label: '難しい言葉を使いません' },
+              { icon: '✅', title: 'すべて無料で読めます', desc: '会員登録・お支払い一切不要です' },
+              { icon: '📋', title: '公式情報をもとに作成', desc: '厚生労働省・法務省など公的機関の情報を参照しています' },
+              { icon: '📖', title: '難しい言葉を使いません', desc: '専門用語はわかりやすく言い換えて解説します' },
             ].map(b => (
-              <div key={b.value}>
-                <p style={{ fontSize: 24, fontWeight: 700, color: '#1a3a6b' }}>{b.value}</p>
-                <p style={{ fontSize: 12, color: '#777', marginTop: 4, lineHeight: 1.5 }}>{b.label}</p>
+              <div key={b.title} style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                <span style={{ fontSize: 24, flexShrink: 0, marginTop: 2 }}>{b.icon}</span>
+                <div>
+                  <p style={{ fontWeight: 700, fontSize: 17, color: '#1a1a1a', marginBottom: 2 }}>{b.title}</p>
+                  <p style={{ fontSize: 15, color: '#666', lineHeight: 1.6 }}>{b.desc}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -207,15 +294,22 @@ export default function HomePage() {
       </div>
 
       {/* フッター */}
-      <footer className="mt-12 py-8 px-4" style={{ background: '#222', borderTop: '1px solid #444' }}>
+      <footer style={{ marginTop: 48, padding: '32px 16px', background: '#222', borderTop: '2px solid #444' }}>
         <div className="max-w-3xl mx-auto">
-          <div className="flex flex-wrap gap-6 mb-4 justify-center">
-            <Link href="/about" style={{ color: '#aaa', fontSize: 14, textDecoration: 'none' }}>運営者情報</Link>
-            <Link href="/privacy" style={{ color: '#aaa', fontSize: 14, textDecoration: 'none' }}>プライバシーポリシー</Link>
-            <Link href="/contact" style={{ color: '#aaa', fontSize: 14, textDecoration: 'none' }}>お問い合わせ</Link>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginBottom: 20, justifyContent: 'center' }}>
+            {[
+              { href: '/about', label: '運営者情報' },
+              { href: '/privacy', label: 'プライバシーポリシー' },
+              { href: '/contact', label: 'お問い合わせ' },
+            ].map(l => (
+              <Link key={l.href} href={l.href} style={{ color: '#ccc', fontSize: 16, textDecoration: 'none' }}>
+                {l.label}
+              </Link>
+            ))}
           </div>
-          <p className="text-center" style={{ color: '#777', fontSize: 12 }}>
-            © 2026 年金・相続・介護の手続きガイド｜本サイトの情報は参考情報です。詳細は各機関にご確認ください。
+          <p style={{ color: '#888', fontSize: 14, textAlign: 'center', lineHeight: 1.8 }}>
+            © 2026 年金・相続・介護の手続きガイド<br />
+            本サイトの情報は参考情報です。詳細は各機関にご確認ください。
           </p>
         </div>
       </footer>
