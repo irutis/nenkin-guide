@@ -122,8 +122,16 @@ slug: ${keyword.slug}
   ],
   "keywords": ${JSON.stringify(keyword.keywords)},
   "publishedAt": "${today}",
-  "relatedSlugs": []
-}`
+  "relatedSlugs": [],
+  "faqs": [
+    {
+      "q": "読者が実際に検索しそうな質問（30文字以内）",
+      "a": "具体的な数字・手順を含む回答（100〜150文字）"
+    }
+  ]
+}
+
+faqs は必ず5〜6件作成してください。ターゲットキーワードに沿った、Googleで実際に検索されそうな質問を選んでください。`
 
   const res = await client.messages.create({
     model: 'claude-haiku-4-5-20251001',

@@ -1,0 +1,29 @@
+name: Patch FAQs to existing articles
+
+on:
+  workflow_dispatch:
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm ci
+
+      - name: Run FAQ patch script
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node scripts/patch-faqs.mjs
+
+      - name: Commit patched articles
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/data/articles/*.json
+          git diff --staged --quiet || git commit -m "feat: 既存記事にFAQを一括追加"
+          git push
