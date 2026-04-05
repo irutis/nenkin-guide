@@ -100,19 +100,9 @@ export default function HomePage() {
             60代・70代のための<br />手続きガイド
           </h1>
           <p style={{ color: '#c8d9f0', fontSize: 18, lineHeight: 1.8 }}>
-            年金・相続・介護の手続きを<br />
-            <strong style={{ color: 'white' }}>やさしい言葉</strong>でわかりやすく解説します
+            厚生労働省・法務省の公式情報をもとに<br />
+            <strong style={{ color: 'white' }}>手続きの流れと必要書類</strong>を解説します
           </p>
-          <div style={{
-            background: 'rgba(255,255,255,0.12)',
-            borderRadius: 12,
-            padding: '12px 20px',
-            marginTop: 16,
-            fontSize: 16,
-            color: '#e0ecff',
-          }}>
-            ✅ すべて<strong style={{ color: 'white' }}>無料</strong>で読めます　✅ 難しい言葉は使いません
-          </div>
         </div>
       </section>
 
@@ -271,25 +261,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* このサイトについて */}
-        <section style={{ marginTop: 36, background: 'white', borderRadius: 16, border: '1px solid #ddd', padding: '24px', boxShadow: '0 2px 6px rgba(0,0,0,0.05)' }}>
-          <p style={{ fontWeight: 700, color: '#1a3a6b', fontSize: 18, marginBottom: 16 }}>このサイトについて</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            {[
-              { icon: '✅', title: 'すべて無料で読めます', desc: '会員登録・お支払い一切不要です' },
-              { icon: '📋', title: '公式情報をもとに作成', desc: '厚生労働省・法務省など公的機関の情報を参照しています' },
-              { icon: '📖', title: '難しい言葉を使いません', desc: '専門用語はわかりやすく言い換えて解説します' },
-            ].map(b => (
-              <div key={b.title} style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-                <span style={{ fontSize: 24, flexShrink: 0, marginTop: 2 }}>{b.icon}</span>
-                <div>
-                  <p style={{ fontWeight: 700, fontSize: 17, color: '#1a1a1a', marginBottom: 2 }}>{b.title}</p>
-                  <p style={{ fontSize: 15, color: '#666', lineHeight: 1.6 }}>{b.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
 
       </div>
 
