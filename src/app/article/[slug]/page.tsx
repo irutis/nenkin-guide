@@ -150,24 +150,64 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         {/* 本文 */}
         <div>
           {article.sections.map((s, i) => (
-            <section key={i} id={`section-${i}`} style={{ marginBottom: 44 }}>
+            <section key={i} id={`section-${i}`} style={{ marginBottom: 52 }}>
               <h2 style={{
                 fontSize: 22,
                 fontWeight: 700,
                 color: '#1a1a1a',
                 borderLeft: `5px solid ${colors.border}`,
                 paddingLeft: 16,
-                marginBottom: 18,
-                lineHeight: 1.45,
+                marginBottom: 20,
+                lineHeight: 1.5,
               }}>
                 {s.heading}
               </h2>
-              <div style={{ fontSize: 18, lineHeight: 1.95, color: '#222' }}>
-                {s.body.split('\n').map((line, j) => (
-                  <p key={j} style={{ marginBottom: line === '' ? 14 : 0 }}>
-                    {line}
-                  </p>
-                ))}
+              <div style={{ fontSize: 17, lineHeight: 2.0, color: '#222' }}>
+                {s.body.split('\n').map((line, j) => {
+                  if (line === '') return <div key={j} style={{ height: 12 }} />
+                  // 【...】で始まる行：小見出し
+                  if (/^【.+】$/.test(line.trim())) {
+                    return (
+                      <p key={j} style={{ fontWeight: 700, color: '#1a3a6b', fontSize: 16, marginTop: 20, marginBottom: 6, background: '#f0f4f8', padding: '6px 12px', borderRadius: 6, display: 'inline-block' }}>
+                        {line}
+                      </p>
+                    )
+                  }
+                  // 【...】を含む行（行の途中に含む場合）：太字部分を強調
+                  if (line.includes('【') && line.includes('】')) {
+                    return (
+                      <p key={j} style={{ fontWeight: 700, color: '#1a1a1a', fontSize: 16, marginTop: 18, marginBottom: 4 }}>
+                        {line}
+                      </p>
+                    )
+                  }
+                  // ・で始まる行：箇条書き
+                  if (line.startsWith('・')) {
+                    return (
+                      <div key={j} style={{ display: 'flex', gap: 8, marginBottom: 6, paddingLeft: 8 }}>
+                        <span style={{ color: colors.border, fontWeight: 700, flexShrink: 0, marginTop: 2 }}>●</span>
+                        <p style={{ margin: 0, lineHeight: 1.8 }}>{line.replace(/^・/, '')}</p>
+                      </div>
+                    )
+                  }
+                  // ①②③などで始まる行：番号付きリスト
+                  if (/^[①②③④⑤⑥⑦⑧⑨]/.test(line)) {
+                    return (
+                      <div key={j} style={{ display: 'flex', gap: 10, marginBottom: 10, paddingLeft: 8, alignItems: 'flex-start' }}>
+                        <span style={{ background: colors.border, color: 'white', borderRadius: '50%', width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, flexShrink: 0, marginTop: 2 }}>
+                          {line.slice(0, 1)}
+                        </span>
+                        <p style={{ margin: 0, lineHeight: 1.8 }}>{line.slice(1).replace(/^[．.]\s*/, '')}</p>
+                      </div>
+                    )
+                  }
+                  // 通常の段落
+                  return (
+                    <p key={j} style={{ marginBottom: 12 }}>
+                      {line}
+                    </p>
+                  )
+                })}
               </div>
               {i === Math.floor(article.sections.length / 2) - 1 && (
                 <AdUnit slot="3456789012" format="auto" />
