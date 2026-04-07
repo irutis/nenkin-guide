@@ -5,6 +5,84 @@ import { PREFECTURES, getPrefectureBySlug } from '@/data/prefectures'
 import AffiliateBanners from '@/components/AffiliateBanners'
 import AdUnit from '@/components/AdUnit'
 
+// 主要都道府県の固有データ（SEO強化・独自コンテンツ）
+const PREFECTURE_SPECIFIC: Record<string, {
+  offices: { name: string; address: string; tel: string; hours: string }[]
+  localStats: string
+  extraSection: { heading: string; body: string }
+  extraFaqs: { q: string; a: string }[]
+}> = {
+  kyoto: {
+    offices: [
+      { name: '京都年金事務所', address: '京都市南区東九条南烏丸町28 京都テルサ東館3F', tel: '075-622-5001', hours: '平日 8:30〜17:15（月曜19:00まで）' },
+      { name: '京都北年金事務所', address: '京都市中京区烏丸通二条下る秋野々町529 ライオンズ烏丸二条ビル4F', tel: '075-256-8500', hours: '平日 8:30〜17:15（月曜19:00まで）' },
+      { name: '福知山年金事務所', address: '福知山市字堀2459-10', tel: '0773-22-2951', hours: '平日 8:30〜17:15（月曜19:00まで）' },
+    ],
+    localStats: '京都府の高齢者（65歳以上）人口は約75万人（2024年）で、高齢化率は約29%。全国平均を上回る水準です。老齢基礎年金の平均受給額は月約56,000円、老齢厚生年金（基礎含む）の平均は月約145,000円（京都府内受給者の実績ベース）。',
+    extraSection: {
+      heading: '京都府の年金受給者向け地域サービス',
+      body: '京都府では、年金生活者のための相談窓口が充実しています。\n\n【京都府社会保険労務士会の無料相談】\n京都府内の社会保険労務士が月1回程度、無料で年金相談を実施しています。詳細は京都府社会保険労務士会（TEL: 075-213-8220）にお問い合わせください。\n\n【京都市シニア活動センター】\n京都市内の高齢者向け相談窓口。年金に限らず、介護・生活全般の相談ができます。各区の「いきいき市民活動センター」でも対応可能。\n\n【京都府の特徴】\n京都府は古都として伝統産業（西陣織・清水焼など）の職人が多く、個人事業主・自営業者の割合が高い地域です。国民年金のみ加入の方も多いため、「年金生活者支援給付金」の対象になる方も多くいます。心当たりがある方は日本年金機構から案内が届いているか確認しましょう。',
+    },
+    extraFaqs: [
+      {
+        q: '京都年金事務所の場所・アクセスを教えてください',
+        a: '京都年金事務所は京都市南区東九条南烏丸町28 京都テルサ東館3Fにあります。近鉄「東寺駅」から徒歩5分、地下鉄「九条駅」から徒歩8分です。予約は電話（075-622-5001）またはねんきんネットから行えます。',
+      },
+      {
+        q: '京都府で年金の繰り下げ受給を選んだ場合の増額はどのくらいですか？',
+        a: '1ヶ月繰り下げるごとに0.7%増額されます。70歳まで待てば42%増、75歳まで待てば最大84%増になります。京都府の平均寿命（男性約81歳・女性約88歳）を考慮すると、健康な方は繰り下げが有利な場合が多いです。京都年金事務所で試算してもらうことができます。',
+      },
+    ],
+  },
+  osaka: {
+    offices: [
+      { name: '大阪年金事務所', address: '大阪市中央区谷町2-3-25 日本年金機構大阪ビル', tel: '06-6941-7521', hours: '平日 8:30〜17:15（月曜19:00まで）' },
+      { name: '大阪北年金事務所', address: '大阪市北区梅田1-2-2 大阪駅前第2ビル10F', tel: '06-6344-1941', hours: '平日 8:30〜17:15（月曜19:00まで）' },
+      { name: '大阪西年金事務所', address: '大阪市西区靱本町2-2-4', tel: '06-6538-2941', hours: '平日 8:30〜17:15（月曜19:00まで）' },
+      { name: '堺年金事務所', address: '堺市堺区三国ヶ丘御幸通59 泉北高速鉄道三国ヶ丘ビル5F', tel: '072-238-5101', hours: '平日 8:30〜17:15（月曜19:00まで）' },
+    ],
+    localStats: '大阪府の高齢者（65歳以上）人口は約220万人（2024年）で全国2位。高齢化率は約25%。老齢基礎年金の平均受給額は月約55,000円、老齢厚生年金（基礎含む）の平均は月約148,000円（大阪府内受給者の実績ベース）。大阪府は受給者数が多く、年金事務所が混雑しやすいため、事前予約が強く推奨されています。',
+    extraSection: {
+      heading: '大阪府の年金相談を賢く活用する方法',
+      body: '大阪府内には10か所以上の年金事務所があります。混雑を避けるためのコツをご紹介します。\n\n【予約制の活用（強く推奨）】\n大阪の年金事務所は全国でも特に混雑します。予約なしで来所すると2〜3時間待つことも珍しくありません。必ずねんきんネット（https://www.nenkin.go.jp/n_net/）または電話で事前予約をしてから来所してください。\n\n【混雑しにくい曜日・時間帯】\n月曜と月末は特に混雑します。火〜木曜の午後（13:30〜15:30）が比較的空いています。\n\n【大阪市内の区役所でもできる手続き】\n住所変更届・国民年金保険料の免除申請・被扶養者届などは各区役所の保険年金担当窓口でも手続き可能。年金事務所への来所を省けます。\n\n【大阪府の特徴的なサービス】\n大阪府社会保険労務士会（TEL: 06-6941-1153）では年金に特化した無料電話相談を実施しています。複雑なケース（離婚後の年金分割・海外在住歴あり等）もこちらで相談できます。',
+    },
+    extraFaqs: [
+      {
+        q: '大阪で年金の手続きをするとき、どの年金事務所に行けばいいですか？',
+        a: '基本的にはお住まいの住所を管轄する年金事務所に行きます。大阪市内であれば大阪北・大阪・大阪西・大阪東・大阪南の各事務所のいずれかが管轄です。管轄事務所はねんきんダイヤル（0570-05-1165）に問い合わせるか、日本年金機構のウェブサイトで住所を入力して確認できます。',
+      },
+      {
+        q: '大阪の年金事務所は予約なしで行けますか？',
+        a: '予約なしでも来所できますが、大阪の年金事務所は非常に混雑しており、1〜3時間待ちになることも多いです。ねんきんネットまたはお電話でご予約の上、来所することを強くお勧めします。',
+      },
+    ],
+  },
+  aichi: {
+    offices: [
+      { name: '名古屋南年金事務所', address: '名古屋市熱田区伝馬2-3-19', tel: '052-671-7836', hours: '平日 8:30〜17:15（月曜19:00まで）' },
+      { name: '名古屋北年金事務所', address: '名古屋市北区清水4-17-1', tel: '052-911-1320', hours: '平日 8:30〜17:15（月曜19:00まで）' },
+      { name: '名古屋西年金事務所', address: '名古屋市中村区名駅4-11-1 名古屋フォーラムビル6F', tel: '052-452-2711', hours: '平日 8:30〜17:15（月曜19:00まで）' },
+      { name: '岡崎年金事務所', address: '岡崎市柱4-3-2', tel: '0564-52-6811', hours: '平日 8:30〜17:15（月曜19:00まで）' },
+      { name: '豊橋年金事務所', address: '豊橋市大国町111', tel: '0532-52-7170', hours: '平日 8:30〜17:15（月曜19:00まで）' },
+    ],
+    localStats: '愛知県の高齢者（65歳以上）人口は約170万人（2024年）で全国4位。高齢化率は約22%と全国で最も低い水準の一つ（トヨタ関連企業が集まる製造業県のため現役世代が多い）。老齢厚生年金（基礎含む）の平均は月約160,000円と全国平均より高め（厚生年金の平均加入期間が長いため）。',
+    extraSection: {
+      heading: '愛知県（名古屋）の年金手続きの特徴と注意点',
+      body: '愛知県は製造業・自動車産業の中心地として、会社員・厚生年金加入者の割合が高い地域です。\n\n【愛知県の年金の特徴】\nトヨタ・デンソー・アイシンなど大企業が多く、長期間厚生年金に加入している方が多いため、全国平均より年金受給額が高い傾向があります。また、企業年金（確定給付企業年金・企業型DC）と公的年金を両方受給している方も多いです。\n\n【企業年金との注意点】\n企業年金と公的老齢厚生年金を同時受給する場合、「在職老齢年金」のルールにより、月収+年金が50万円を超えると年金が一部カットされます。不安な方は名古屋南・北・西いずれかの年金事務所で無料試算を依頼できます。\n\n【名古屋市の区役所活用】\n名古屋市内の区役所（16区）でも国民年金の手続きが可能。住所変更・保険料免除申請・学生納付特例などは各区役所で対応できます。\n\n【愛知県社会保険労務士会の相談窓口】\nTEL: 052-962-5270。月〜金（除く祝日）10:00〜16:00に年金相談を受け付けています。',
+    },
+    extraFaqs: [
+      {
+        q: '名古屋（愛知）の年金事務所で手続きする際、何を持参すればいいですか？',
+        a: '基本は①年金請求書（または年金手帳・基礎年金番号通知書）②マイナンバーカードまたは通知カード+身分証明書③戸籍謄本（3ヶ月以内）④住民票④受取口座の通帳またはキャッシュカード。厚生年金の方は雇用保険被保険者証も必要な場合があります。持参書類は事前にねんきんダイヤル（0570-05-1165）に確認することをお勧めします。',
+      },
+      {
+        q: '愛知県で企業年金と公的年金を両方もらえますか？',
+        a: '基本的には両方受給できます。ただし、在職中の場合は「在職老齢年金」の制度により、月収と年金の合計が一定額（2026年度は50万円）を超えると老齢厚生年金が一部停止される場合があります。詳細は名古屋の年金事務所でご確認ください。',
+      },
+    ],
+  },
+}
+
 export async function generateStaticParams() {
   return PREFECTURES.map(p => ({ prefecture: p.slug }))
 }
@@ -20,6 +98,7 @@ export async function generateMetadata({ params }: { params: Promise<{ prefectur
 }
 
 const RELATED_ARTICLES = [
+  { href: '/article/nenkin-tetsuzuki-kanzen-guide', title: '年金の手続き完全ガイド｜全種類を解説' },
   { href: '/article/nenkin-tsuki-ikura', title: '年金は月いくらもらえる？' },
   { href: '/article/nenkin-shinsei-houhou', title: '年金の受け取り申請方法' },
   { href: '/article/kokumin-kosei-chigai', title: '国民年金と厚生年金の違い' },
@@ -58,6 +137,8 @@ export default async function NenkinPrefecturePage({ params }: { params: Promise
     },
   ]
 
+  const specific = PREFECTURE_SPECIFIC[pref.slug]
+
   const faqs = [
     {
       q: `${pref.name}の年金事務所の電話番号を教えてください`,
@@ -71,6 +152,7 @@ export default async function NenkinPrefecturePage({ params }: { params: Promise
       q: `${pref.name}で年金を受け取っていない場合はどうすればいいですか？`,
       a: `まずねんきんダイヤル（0570-05-1165）に電話するか、${pref.capital}の年金事務所の窓口に相談してください。未請求の年金は過去5年分まで遡って受け取ることができる場合があります。`,
     },
+    ...(specific?.extraFaqs ?? []),
   ]
 
   const jsonLd = {
@@ -136,6 +218,37 @@ export default async function NenkinPrefecturePage({ params }: { params: Promise
           </ol>
         </div>
 
+        {/* 都道府県固有：年金事務所一覧テーブル */}
+        {specific && (
+          <section style={{ marginBottom: 44 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1a1a1a', borderLeft: `5px solid ${color.border}`, paddingLeft: 16, marginBottom: 18, lineHeight: 1.45 }}>
+              {pref.name}の年金事務所一覧（住所・電話番号）
+            </h2>
+            <div style={{ fontSize: 16, color: '#333', lineHeight: 1.8, marginBottom: 14 }}>
+              <p>{pref.name}内の主要な年金事務所の住所・電話番号・受付時間をまとめました。</p>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {specific.offices.map((office, i) => (
+                <div key={i} style={{ background: 'white', border: `1px solid ${color.border}30`, borderRadius: 12, padding: '16px 20px' }}>
+                  <p style={{ fontWeight: 700, fontSize: 17, color: '#1a1a1a', marginBottom: 6 }}>📍 {office.name}</p>
+                  <p style={{ fontSize: 15, color: '#444', marginBottom: 4 }}>住所：{office.address}</p>
+                  <p style={{ fontSize: 15, color: '#444', marginBottom: 4 }}>電話：<strong>{office.tel}</strong></p>
+                  <p style={{ fontSize: 14, color: '#666' }}>受付：{office.hours}</p>
+                </div>
+              ))}
+            </div>
+            <p style={{ fontSize: 14, color: '#888', marginTop: 10 }}>※ 住所・電話番号は変更される場合があります。来所前に電話またはウェブサイトでご確認ください。</p>
+          </section>
+        )}
+
+        {/* 都道府県固有：地域統計 */}
+        {specific && (
+          <div style={{ background: '#eff4fb', border: `1px solid ${color.border}`, borderRadius: 12, padding: '18px 22px', marginBottom: 36 }}>
+            <p style={{ fontWeight: 700, color: color.text, fontSize: 16, marginBottom: 8 }}>📊 {pref.name}の年金受給状況（データ）</p>
+            <p style={{ fontSize: 16, color: '#333', lineHeight: 1.8 }}>{specific.localStats}</p>
+          </div>
+        )}
+
         {/* 本文 */}
         {sections.map((s, i) => (
           <section key={i} id={`section-${i}`} style={{ marginBottom: 44 }}>
@@ -150,6 +263,20 @@ export default async function NenkinPrefecturePage({ params }: { params: Promise
             {i === 1 && <AdUnit slot="1234567891" format="auto" />}
           </section>
         ))}
+
+        {/* 都道府県固有：追加セクション */}
+        {specific && (
+          <section style={{ marginBottom: 44 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1a1a1a', borderLeft: `5px solid ${color.border}`, paddingLeft: 16, marginBottom: 18, lineHeight: 1.45 }}>
+              {specific.extraSection.heading}
+            </h2>
+            <div style={{ fontSize: 18, lineHeight: 1.95, color: '#222' }}>
+              {specific.extraSection.body.split('\n').map((line, j) => (
+                <p key={j} style={{ marginBottom: line === '' ? 14 : 0 }}>{line}</p>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* FAQ */}
         <div style={{ marginTop: 48 }}>
